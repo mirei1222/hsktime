@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK_time · 소개</title>
+<meta name="description" content="HSK_time은 신HSK 3.0(1~9급) 전급수 단어장 앱을 만드는 중국어 학습 채널입니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F13; --surface:#171921; --line:#2A2E3E;
+  --ink:#F2F3F7; --muted:#8B90A3; --accent:#FF4D5E; --gold:#F5C453;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Noto Sans KR',sans-serif;margin:0;}
+html,body{background:var(--bg);color:var(--ink);}
+body{display:flex;justify-content:center;min-height:100vh;}
+#page{width:100%;max-width:640px;padding:0 0 60px;}
+header{position:sticky;top:0;z-index:10;background:rgba(14,15,19,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:17px;letter-spacing:-.02em;}
+.logo b{color:var(--accent);} .logo span{color:var(--muted);font-weight:700;}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-left:16px;font-weight:500;}
+nav a.cta{color:#fff;background:var(--accent);padding:8px 14px;border-radius:9px;font-weight:700;}
+main{padding:40px 24px;}
+h1{font-size:26px;font-weight:900;margin-bottom:18px;letter-spacing:-.02em;}
+p{color:var(--muted);font-size:14.5px;line-height:1.85;margin-bottom:16px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:24px 0;}
+.card h2{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.card p{margin-bottom:0;}
+ul{color:var(--muted);font-size:14.5px;line-height:1.9;padding-left:20px;margin-bottom:16px;}
+footer{padding:28px 24px;text-align:center;border-top:1px solid var(--line);}
+footer .flinks{display:flex;justify-content:center;gap:18px;margin-bottom:14px;flex-wrap:wrap;}
+footer a{color:var(--muted);text-decoration:none;font-size:13px;}
+footer .copy{color:var(--muted);font-size:11.5px;opacity:.7;}
+</style>
+</head>
+<body>
+<div id="page">
+<header>
+  <div class="logo"><b>HSK</b><span>_time</span></div>
+  <nav><a class="cta" href="index.html">학습 시작</a></nav>
+</header>
+<main>
+  <h1>HSK_time을 소개합니다</h1>
+  <p>HSK_time은 신HSK(3.0) 1급부터 7-9급까지 전 급수, 총 11,000단어를 다루는 중국어 단어장 학습 앱입니다. 중국어를 배우는 학습자가 급수별로 필요한 단어와 예문을 효율적으로 익힐 수 있도록 만들었습니다.</p>
+
+  <div class="card">
+    <h2>무엇을 제공하나요</h2>
+    <ul>
+      <li>1~9급 전 급수, 11,000개 단어와 실제 시험 스타일의 예문</li>
+      <li>단어 학습 · 퀴즈를 통한 반복 암기</li>
+      <li>급수별 필요 능력을 정리한 학습 가이드</li>
+    </ul>
+  </div>
+
+  <p>HSK_time은 유튜브 채널을 함께 운영하며 중국어 학습 콘텐츠를 만들고 있습니다. 앱의 1급(300단어)은 누구나 무료로 이용할 수 있고, 2급 이상은 이용권을 통해 전체 급수를 학습할 수 있습니다.</p>
+
+  <p>문의사항이 있으시면 <a href="contact.html" style="color:var(--accent);">문의 페이지</a>를 통해 연락해주세요.</p>
+</main>
+<footer>
+  <div class="flinks">
+    <a href="index.html">학습 앱</a>
+    <a href="guide.html">HSK 가이드</a>
+    <a href="privacy.html">개인정보처리방침</a>
+    <a href="contact.html">문의</a>
+  </div>
+  <div class="copy">© 2026 HSK_time. All rights reserved.</div>
+</footer>
+</div>
+</body>
+</html>
