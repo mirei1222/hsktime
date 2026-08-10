@@ -11653,11 +11653,6 @@ function speakWord(entry) {
   audio.play().catch((e) => console.warn("단어 오디오 재생 실패:", e));
 }
 
-// 기존 HTML의 onclick="speak(...)" 호환용 별칭
-function speak(entry) {
-  speakWord(entry);
-}
-
 /* --- 예문 음성 (_sentence.mp3) --- */
 function sentenceAudioUrl(folder, id) {
   if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
@@ -11687,6 +11682,20 @@ function speakSentence(entry) {
   audio.play().catch((e) => console.warn("예문 오디오 재생 실패:", e));
 }
 
+/* --- 통합 호출 함수 (HTML 호환용) --- */
+function speak(entry, type) {
+  if (type === 'sentence' || type === 'sen' || type === 'ex') {
+    speakSentence(entry);
+  } else {
+    speakWord(entry);
+  }
+}
+
+// HTML에서 예문용으로 사용될 수 있는 다양한 함수명 별칭 연결
+function speakEx(entry) { speakSentence(entry); }
+function speakExample(entry) { speakSentence(entry); }
+function playSentence(entry) { speakSentence(entry); }
+function speakSent(entry) { speakSentence(entry); }
 /* WebAudio quiz feedback sounds */
 let AC = null;
 function tone(freq, dur, type, when, vol) {
