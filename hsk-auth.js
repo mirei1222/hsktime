@@ -17,7 +17,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  *    이 키만으로는 남의 데이터를 읽거나 구독을 늘릴 수 없어요.
  *    (service_role 키는 절대 여기 넣으면 안 돼요!)
  * ---------------------------------------------------------- */
-const SUPABASE_URL = "https://abskpzeitstjuxqgqvrpURL.supabase.co";
+const SUPABASE_URL = "https://abskpzeitstjuxqgqvrp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_jgqTaEWUhwzFKbKlMSKznA_IBavW_-g";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
