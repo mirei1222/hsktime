@@ -11632,37 +11632,6 @@ function wordAudioUrl(folder, id) {
   return data && data.publicUrl;
 }
 
-/* ---------------- audio engine (Supabase Storage 전용) ---------------- */
-window.currentAudio = null;
-
-// 재생 중인 모든 오디오 즉시 중지
-function stopAllAudio() {
-  if (window.currentAudio) {
-    window.currentAudio.pause();
-    window.currentAudio.currentTime = 0;
-    window.currentAudio = null;
-  }
-}
-
-/* 단어 번호 → Storage 폴더명 */
-function folderForId(id) {
-  if (id <= 300) return "hsk1";
-  if (id <= 500) return "hsk2";
-  if (id <= 1000) return "hsk3";
-  if (id <= 2000) return "hsk4";
-  if (id <= 3600) return "hsk5";
-  if (id <= 5400) return "hsk6";
-  return "hsk79";
-}
-
-/* --- 단어 음성 (_word.mp3) --- */
-function wordAudioUrl(folder, id) {
-  if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
-  const path = `${folder}/${id}_word.mp3`;
-  const { data } = window.HSKAuth.supabase.storage.from("audio").getPublicUrl(path);
-  return data && data.publicUrl;
-}
-
 let lastSpeakTime = 0;
 function speakWord(entry) {
   if (!entry) return;
@@ -11682,6 +11651,11 @@ function speakWord(entry) {
   const audio = new Audio(url);
   window.currentAudio = audio;
   audio.play().catch((e) => console.warn("단어 오디오 재생 실패:", e));
+}
+
+// 기존 HTML의 onclick="speak(...)" 호환용 별칭
+function speak(entry) {
+  speakWord(entry);
 }
 
 /* --- 예문 음성 (_sentence.mp3) --- */
@@ -11728,7 +11702,6 @@ function tone(freq, dur, type, when, vol) {
 }
 const sndGood = () => { tone(659, .12, "sine", 0, .25); tone(880, .22, "sine", .1, .25); };
 const sndBad = () => { tone(180, .3, "square", 0, .12); };
-
 /* ---------------- inline stroke order ---------------- */
 let hwPromise = null;
 function loadHanziWriter() {
