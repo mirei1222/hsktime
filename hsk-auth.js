@@ -18,7 +18,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  *    (service_role 키는 절대 여기 넣으면 안 돼요!)
  * ---------------------------------------------------------- */
 const SUPABASE_URL = "https://abskpzeitstjuxqgqvrpURL.supabase.co";
-const SUPABASE_ANON_KEY = "ap-northeast-2";
+const SUPABASE_ANON_KEY = "sb_publishable_jgqTaEWUhwzFKbKlMSKznA_IBavW_-g";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
