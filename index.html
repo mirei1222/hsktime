@@ -11601,35 +11601,44 @@ function quizCountFor(levelId, catName) {
 const $ = (id) => document.getElementById(id);
 const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-/* ---------------- audio engine (confirmed working in real mobile Chrome) ----------------
-   - synchronous speak() when nothing is in flight, to preserve the "direct tap" gesture chain
-   - pre-warmed voice cache so speak() never waits on the async voiceschanged event
-   - real onstart/onerror/silent-timeout diagnostics wired into the on-screen panel
-------------------------------------------------------------------------------------------- */
+/* ---------------- audio engine (confirmed working in real mobile Chrome) ---------------- */
 let liveUtterance = null;
 let voiceCache = null;
+window.currentAudio = null; // 💡 재생 중인 HTML5 Audio 전역 관리
+
+// 💡 재생 중인 모든 소리(녹음 파일 및 TTS)를 즉시 중지시키는 함수 (음성 중복 완벽 방지)
+function stopAllAudio() {
+  if (window.currentAudio) {
+    window.currentAudio.pause();
+    window.currentAudio.currentTime = 0;
+    window.currentAudio = null;
+  }
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
 
 function pickChineseVoice() {
-    if (!("speechSynthesis" in window)) return null;
+  if (!("speechSynthesis" in window)) return null;
+  const voices = speechSynthesis.getVoices();
 
-    const voices = speechSynthesis.getVoices();
+  // 1순위: 중국 본토
+  let v = voices.find(x => x.lang === "zh-CN");
+  if (v) return v;
 
-    // 1순위: 중국 본토
-    let v = voices.find(x => x.lang === "zh-CN");
-    if (v) return v;
+  // 2순위: 중국어 계열
+  v = voices.find(x => x.lang.startsWith("zh"));
+  if (v) return v;
 
-    // 2순위: 중국어 계열
-    v = voices.find(x => x.lang.startsWith("zh"));
-    if (v) return v;
-
-    return null;
+  return null;
 }
- 
+
 function getVoiceSnapshot() {
   const supported = "speechSynthesis" in window;
   const voices = supported ? window.speechSynthesis.getVoices() || [] : [];
   return { supported, total: voices.length, zh: voices.filter((v) => /^zh/i.test(v.lang)).map((v) => v.name + " (" + v.lang + ")") };
 }
+
 function warmupVoices(onReady) {
   if (!("speechSynthesis" in window)) { onReady(getVoiceSnapshot()); return; }
   const check = () => {
@@ -11640,25 +11649,27 @@ function warmupVoices(onReady) {
   if (check()) return;
   const handler = () => { if (check()) window.speechSynthesis.removeEventListener("voiceschanged", handler); };
   window.speechSynthesis.addEventListener("voiceschanged", handler);
- setTimeout(() => {
+  setTimeout(() => {
     if (!check()) {
-        if (window.speechSynthesis) {
-            window.speechSynthesis.getVoices();
-            setTimeout(() => {
-                check();
-                onReady(getVoiceSnapshot());
-            }, 800);
-        } else {
-            onReady(getVoiceSnapshot());
-        }
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        setTimeout(() => {
+          check();
+          onReady(getVoiceSnapshot());
+        }, 800);
+      } else {
+        onReady(getVoiceSnapshot());
+      }
     }
-}, 1200);
+  }, 1200);
 }
+
 function reportDiag(status) {
   const el = $("diagLast");
   if (!el) return;
   el.textContent = status.ok ? "✅ 성공(" + status.stage + ")" : "❌ " + status.reason;
 }
+
 // 1. 발음의 톤과 속도를 설정하는 함수
 function buildUtterance(text) {
   const cleanText = String(text).trim();
@@ -11666,17 +11677,12 @@ function buildUtterance(text) {
 
   const u = new SpeechSynthesisUtterance(textToSpeak);
   u.lang = "zh-CN"; 
-if (!voiceCache) {
-    voiceCache = pickChineseVoice();
-}
+  if (!voiceCache) voiceCache = pickChineseVoice();
+  if (voiceCache) u.voice = voiceCache;
 
-if (voiceCache) {
-    u.voice = voiceCache;
-}
   u.rate = 0.85; // 차분하고 듣기 좋은 속도
-  u.pitch = 1.0; // 💡 과장된 기계음을 없애고 차분한 기본 톤(1.0)으로 변경
+  u.pitch = 1.0; // 기본 톤
   u.volume = 1;
-
 
   u.onstart = () => reportDiag({ ok: true, stage: "start" });
   u.onerror = (e) => reportDiag({ ok: false, reason: (e && e.error) || "unknown-error" });
@@ -11684,28 +11690,21 @@ if (voiceCache) {
   return u;
 }
 
-// 2. 단어/예문/퀴즈 모두 끊김 없이 재생하는 함수
+// 2. TTS 백업 재생 함수
 function speak(text) {
   try {
     if (!text) return;
-    
-    // 텍스트 정제 (불필요한 공백 제거)
     let cleanText = String(text).trim();
     if (!cleanText) return;
 
+    stopAllAudio(); // 💡 새 음성 시작 전 기존 소리 차단
+
     const textToSpeak = cleanText.length === 1 ? cleanText + '。' : cleanText;
 
-    // --------------------------------------------------------
     // A. 스마트폰에 중국어 음성이 없는 경우 (온라인 백업 음성)
-    // --------------------------------------------------------
     if (!voiceCache) {
-       voiceCache = pickChineseVoice();
-      if (window.currentAudio) {
-        window.currentAudio.pause();
-        window.currentAudio = null;
-      }
+      voiceCache = pickChineseVoice();
 
-      // 💡 긴 예문도 안 잘리고 안정적으로 읽어주는 고품질 백업 엔진 사용
       const encodedText = encodeURIComponent(textToSpeak);
       const primaryUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=gtx&q=${encodedText}`;
 
@@ -11715,7 +11714,6 @@ function speak(text) {
       window.currentAudio.play().then(() => {
         reportDiag({ ok: true, stage: "start (online fallback)" });
       }).catch(e => {
-        // 구글 엔진 실패 시 2차 유도(Youdao) 엔진으로 재시도
         const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodedText}&le=zh`;
         window.currentAudio = new Audio(fallbackUrl);
         window.currentAudio.play().catch(err => {
@@ -11726,42 +11724,30 @@ function speak(text) {
       return;
     }
 
-    // --------------------------------------------------------
     // B. 스마트폰에 중국어 음성이 설치된 경우 (내장 TTS)
-    // --------------------------------------------------------
     if (!("speechSynthesis" in window)) {
       reportDiag({ ok: false, reason: "unsupported" });
       return;
     }
 
-   const synth = window.speechSynthesis;
+    const synth = window.speechSynthesis;
 
-if (synth.speaking || synth.pending) {
-    synth.cancel();
-}
-
-// 기존 재생이 완전히 멈춘 후 새 음성 재생
-setTimeout(() => {
-    try {
+    setTimeout(() => {
+      try {
         const u = buildUtterance(cleanText);
         liveUtterance = u;
         synth.speak(u);
-    } catch (e) {
+      } catch (e) {
         reportDiag({ ok: false, reason: "exception: " + e.message });
-    }
-}, 50);
+      }
+    }, 50);
 
   } catch (e) {
     reportDiag({ ok: false, reason: "speak-exception: " + e.message });
   }
 }
 
-
-/* ---------------- TTS 발음 힌트 (다음자 단독 글자 오발음 방지) ----------------
-   单字 다음자(多音字)를 화면에 한 글자만 보여줄 때, TTS 엔진이 문맥 없이
-   읽으면 엉뚱한 발음을 고를 수 있어요 (예: 还(hái)를 huán으로 읽는 경우).
-   화면 표시(한자/병음)는 그대로 두고, "듣기" 버튼을 눌렀을 때만 자연스러운
-   2글자 이상 문맥으로 바꿔 읽게 해서 정확한 발음이 나오게 해요. */
+/* ---------------- TTS 발음 힌트 (다음자 단독 글자 오발음 방지) ---------------- */
 const TTS_HINT = {
   41: "都是", 55: "分钟", 67: "还有", 71: "很好",
   287: "一只", 314: "很长", 332: "写得", 333: "慢慢地", 367: "教书",
@@ -11774,8 +11760,8 @@ const TTS_HINT = {
   2097: "曾经", 2121: "朝向", 2183: "传说", 2472: "爱好", 2600: "结果",
   2719: "数量", 3063: "数一数", 3184: "所尊敬", 4281: "结果实", 4292: "解开",
 };
-/* 단어 번호 → Storage 폴더명
-   (기존 python TTS 스크립트가 만든 폴더 구조와 동일하게 맞췄어요) */
+
+/* 단어 번호 → Storage 폴더명 */
 function folderForId(id) {
   if (id <= 300) return "hsk1";
   if (id <= 500) return "hsk2";
@@ -11786,27 +11772,44 @@ function folderForId(id) {
   return "hsk79";
 }
 
-function wordAudioUrl(folder, id, word) {
+function wordAudioUrl(folder, id) {
   if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
-  const path = `${folder}/${id}_${word}_단어.mp3`;
+  const path = `${folder}/${id}_word.mp3`;
   const { data } = window.HSKAuth.supabase.storage.from("audio").getPublicUrl(path);
   return data && data.publicUrl;
 }
 
-/* 단어 발음: Supabase Storage의 녹음 파일을 우선 재생하고,
-   (아직 업로드 전이거나 네트워크 문제로) 재생에 실패하면
-   기존 TTS(speak)로 자동 전환해요. 사용자는 실패를 못 느껴요. */
+/* 단어 발음: Supabase MP3 우선 재생 -> 실패 시 TTS_HINT가 적용된 TTS 전환 */
 function speakWord(entry) {
+  if (!entry) return;
   const id = entry[0];
   const word = entry[1];
-  const folder = folderForId(id);
-  const url = wordAudioUrl(folder, id, word);
+  
+  // 다음자 힌트가 있다면 적용하고, 없으면 일반 단어 사용
+  const fallbackText = (typeof TTS_HINT !== "undefined" && TTS_HINT[id]) ? TTS_HINT[id] : word;
 
-  if (!url) { speak(word); return; }
+  const folder = folderForId(id);
+  const url = wordAudioUrl(folder, id);
+
+  if (!url) { 
+    speak(fallbackText); 
+    return; 
+  }
+
+  stopAllAudio(); // 💡 재생 전 이전 소리 완전히 끄기
 
   const audio = new Audio(url);
-  audio.play().catch(() => speak(word));
-  audio.onerror = () => speak(word);
+  window.currentAudio = audio; // 전역 객체 등록
+
+  let isFallbackTriggered = false;
+  const fallbackToTTS = () => {
+    if (isFallbackTriggered) return;
+    isFallbackTriggered = true;
+    speak(fallbackText);
+  };
+
+  audio.play().catch(fallbackToTTS);
+  audio.onerror = fallbackToTTS;
 }
 
 /* WebAudio quiz feedback sounds */
@@ -11889,6 +11892,7 @@ function buildQuiz(cat) {
    target is "word" for now (sentence recording can reuse this later). */
 const DB_NAME = "hsktime-recordings", STORE_NAME = "clips";
 let dbPromise = null;
+Z
 function openDB() {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve, reject) => {
