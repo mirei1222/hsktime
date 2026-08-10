@@ -11601,165 +11601,17 @@ function quizCountFor(levelId, catName) {
 const $ = (id) => document.getElementById(id);
 const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-/* ---------------- audio engine (confirmed working in real mobile Chrome) ---------------- */
-let liveUtterance = null;
-let voiceCache = null;
-window.currentAudio = null; // 💡 재생 중인 HTML5 Audio 전역 관리
+/* ---------------- audio engine (Supabase Storage 전용) ---------------- */
+window.currentAudio = null;
 
-// 💡 재생 중인 모든 소리(녹음 파일 및 TTS)를 즉시 중지시키는 함수 (음성 중복 완벽 방지)
+// 재생 중인 모든 오디오 즉시 중지
 function stopAllAudio() {
   if (window.currentAudio) {
     window.currentAudio.pause();
     window.currentAudio.currentTime = 0;
     window.currentAudio = null;
   }
-  if ("speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-  }
 }
-
-function pickChineseVoice() {
-  if (!("speechSynthesis" in window)) return null;
-  const voices = speechSynthesis.getVoices();
-
-  // 1순위: 중국 본토
-  let v = voices.find(x => x.lang === "zh-CN");
-  if (v) return v;
-
-  // 2순위: 중국어 계열
-  v = voices.find(x => x.lang.startsWith("zh"));
-  if (v) return v;
-
-  return null;
-}
-
-function getVoiceSnapshot() {
-  const supported = "speechSynthesis" in window;
-  const voices = supported ? window.speechSynthesis.getVoices() || [] : [];
-  return { supported, total: voices.length, zh: voices.filter((v) => /^zh/i.test(v.lang)).map((v) => v.name + " (" + v.lang + ")") };
-}
-
-function warmupVoices(onReady) {
-  if (!("speechSynthesis" in window)) { onReady(getVoiceSnapshot()); return; }
-  const check = () => {
-    const snap = getVoiceSnapshot();
-    if (snap.total > 0) { voiceCache = pickChineseVoice(); onReady(snap); return true; }
-    return false;
-  };
-  if (check()) return;
-  const handler = () => { if (check()) window.speechSynthesis.removeEventListener("voiceschanged", handler); };
-  window.speechSynthesis.addEventListener("voiceschanged", handler);
-  setTimeout(() => {
-    if (!check()) {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.getVoices();
-        setTimeout(() => {
-          check();
-          onReady(getVoiceSnapshot());
-        }, 800);
-      } else {
-        onReady(getVoiceSnapshot());
-      }
-    }
-  }, 1200);
-}
-
-function reportDiag(status) {
-  const el = $("diagLast");
-  if (!el) return;
-  el.textContent = status.ok ? "✅ 성공(" + status.stage + ")" : "❌ " + status.reason;
-}
-
-// 1. 발음의 톤과 속도를 설정하는 함수
-function buildUtterance(text) {
-  const cleanText = String(text).trim();
-  const textToSpeak = cleanText.length === 1 ? cleanText + '。' : cleanText;
-
-  const u = new SpeechSynthesisUtterance(textToSpeak);
-  u.lang = "zh-CN"; 
-  if (!voiceCache) voiceCache = pickChineseVoice();
-  if (voiceCache) u.voice = voiceCache;
-
-  u.rate = 0.85; // 차분하고 듣기 좋은 속도
-  u.pitch = 1.0; // 기본 톤
-  u.volume = 1;
-
-  u.onstart = () => reportDiag({ ok: true, stage: "start" });
-  u.onerror = (e) => reportDiag({ ok: false, reason: (e && e.error) || "unknown-error" });
-
-  return u;
-}
-
-// 2. TTS 백업 재생 함수
-function speak(text) {
-  try {
-    if (!text) return;
-    let cleanText = String(text).trim();
-    if (!cleanText) return;
-
-    stopAllAudio(); // 💡 새 음성 시작 전 기존 소리 차단
-
-    const textToSpeak = cleanText.length === 1 ? cleanText + '。' : cleanText;
-
-    // A. 스마트폰에 중국어 음성이 없는 경우 (온라인 백업 음성)
-    if (!voiceCache) {
-      voiceCache = pickChineseVoice();
-
-      const encodedText = encodeURIComponent(textToSpeak);
-      const primaryUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=gtx&q=${encodedText}`;
-
-      window.currentAudio = new Audio(primaryUrl);
-      window.currentAudio.playbackRate = 0.85;
-
-      window.currentAudio.play().then(() => {
-        reportDiag({ ok: true, stage: "start (online fallback)" });
-      }).catch(e => {
-        const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodedText}&le=zh`;
-        window.currentAudio = new Audio(fallbackUrl);
-        window.currentAudio.play().catch(err => {
-          reportDiag({ ok: false, reason: "online-audio-error: " + err.message });
-        });
-      });
-
-      return;
-    }
-
-    // B. 스마트폰에 중국어 음성이 설치된 경우 (내장 TTS)
-    if (!("speechSynthesis" in window)) {
-      reportDiag({ ok: false, reason: "unsupported" });
-      return;
-    }
-
-    const synth = window.speechSynthesis;
-
-    setTimeout(() => {
-      try {
-        const u = buildUtterance(cleanText);
-        liveUtterance = u;
-        synth.speak(u);
-      } catch (e) {
-        reportDiag({ ok: false, reason: "exception: " + e.message });
-      }
-    }, 50);
-
-  } catch (e) {
-    reportDiag({ ok: false, reason: "speak-exception: " + e.message });
-  }
-}
-
-/* ---------------- TTS 발음 힌트 (다음자 단독 글자 오발음 방지) ---------------- */
-const TTS_HINT = {
-  41: "都是", 55: "分钟", 67: "还有", 71: "很好",
-  287: "一只", 314: "很长", 332: "写得", 333: "慢慢地", 367: "教书",
-  490: "看着", 491: "正在", 551: "还差", 583: "得到", 587: "得走",
-  589: "土地", 614: "出发", 640: "干活", 678: "归还", 875: "为了",
-  968: "长大", 975: "只是", 981: "中间", 984: "种类", 1086: "重新",
-  1220: "干净", 1345: "假的", 1362: "下降", 1436: "空气", 1439: "有空",
-  1472: "量一下", 1579: "很强", 1650: "四川省", 1691: "数字", 1771: "认为",
-  1818: "流血", 1924: "着急", 1959: "种花", 1960: "很重", 2056: "便利",
-  2097: "曾经", 2121: "朝向", 2183: "传说", 2472: "爱好", 2600: "结果",
-  2719: "数量", 3063: "数一数", 3184: "所尊敬", 4281: "结果实", 4292: "解开",
-};
 
 /* 단어 번호 → Storage 폴더명 */
 function folderForId(id) {
@@ -11772,6 +11624,7 @@ function folderForId(id) {
   return "hsk79";
 }
 
+/* --- 단어 음성 (_word.mp3) --- */
 function wordAudioUrl(folder, id) {
   if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
   const path = `${folder}/${id}_word.mp3`;
@@ -11779,37 +11632,85 @@ function wordAudioUrl(folder, id) {
   return data && data.publicUrl;
 }
 
-/* 단어 발음: Supabase MP3 우선 재생 -> 실패 시 TTS_HINT가 적용된 TTS 전환 */
+/* ---------------- audio engine (Supabase Storage 전용) ---------------- */
+window.currentAudio = null;
+
+// 재생 중인 모든 오디오 즉시 중지
+function stopAllAudio() {
+  if (window.currentAudio) {
+    window.currentAudio.pause();
+    window.currentAudio.currentTime = 0;
+    window.currentAudio = null;
+  }
+}
+
+/* 단어 번호 → Storage 폴더명 */
+function folderForId(id) {
+  if (id <= 300) return "hsk1";
+  if (id <= 500) return "hsk2";
+  if (id <= 1000) return "hsk3";
+  if (id <= 2000) return "hsk4";
+  if (id <= 3600) return "hsk5";
+  if (id <= 5400) return "hsk6";
+  return "hsk79";
+}
+
+/* --- 단어 음성 (_word.mp3) --- */
+function wordAudioUrl(folder, id) {
+  if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
+  const path = `${folder}/${id}_word.mp3`;
+  const { data } = window.HSKAuth.supabase.storage.from("audio").getPublicUrl(path);
+  return data && data.publicUrl;
+}
+
+let lastSpeakTime = 0;
 function speakWord(entry) {
   if (!entry) return;
-  const id = entry[0];
-  const word = entry[1];
-  
-  // 다음자 힌트가 있다면 적용하고, 없으면 일반 단어 사용
-  const fallbackText = (typeof TTS_HINT !== "undefined" && TTS_HINT[id]) ? TTS_HINT[id] : word;
 
+  const now = Date.now();
+  if (now - lastSpeakTime < 300) return; // 0.3초 연타 방지
+  lastSpeakTime = now;
+
+  const id = entry[0];
   const folder = folderForId(id);
   const url = wordAudioUrl(folder, id);
 
-  if (!url) { 
-    speak(fallbackText); 
-    return; 
-  }
+  if (!url) return;
 
-  stopAllAudio(); // 💡 재생 전 이전 소리 완전히 끄기
+  stopAllAudio();
 
   const audio = new Audio(url);
-  window.currentAudio = audio; // 전역 객체 등록
+  window.currentAudio = audio;
+  audio.play().catch((e) => console.warn("단어 오디오 재생 실패:", e));
+}
 
-  let isFallbackTriggered = false;
-  const fallbackToTTS = () => {
-    if (isFallbackTriggered) return;
-    isFallbackTriggered = true;
-    speak(fallbackText);
-  };
+/* --- 예문 음성 (_sentence.mp3) --- */
+function sentenceAudioUrl(folder, id) {
+  if (!(window.HSKAuth && window.HSKAuth.supabase)) return null;
+  const path = `${folder}/${id}_sentence.mp3`;
+  const { data } = window.HSKAuth.supabase.storage.from("audio").getPublicUrl(path);
+  return data && data.publicUrl;
+}
 
-  audio.play().catch(fallbackToTTS);
-  audio.onerror = fallbackToTTS;
+let lastSpeakSentenceTime = 0;
+function speakSentence(entry) {
+  if (!entry) return;
+
+  const now = Date.now();
+  if (now - lastSpeakSentenceTime < 300) return; // 0.3초 연타 방지
+  lastSpeakSentenceTime = now;
+
+  const id = entry[0];
+  const folder = folderForId(id);
+  const url = sentenceAudioUrl(folder, id);
+
+  if (!url) return;
+
+  stopAllAudio();
+
+  const audio = new Audio(url);
+  window.currentAudio = audio;
+  audio.play().catch((e) => console.warn("예문 오디오 재생 실패:", e));
 }
 
 /* WebAudio quiz feedback sounds */
@@ -11828,7 +11729,7 @@ function tone(freq, dur, type, when, vol) {
 const sndGood = () => { tone(659, .12, "sine", 0, .25); tone(880, .22, "sine", .1, .25); };
 const sndBad = () => { tone(180, .3, "square", 0, .12); };
 
-/* ---------------- inline stroke order (no external navigation) ---------------- */
+/* ---------------- inline stroke order ---------------- */
 let hwPromise = null;
 function loadHanziWriter() {
   if (window.HanziWriter) return Promise.resolve(window.HanziWriter);
@@ -11875,7 +11776,7 @@ function renderStrokeChar(container, char) {
   }).catch(() => { state.textContent = "획순을 불러올 수 없어요"; state.classList.add("err"); });
 }
 
-/* ---------------- quiz generation (distractors sampled directly from real word data) ---------------- */
+/* ---------------- quiz generation ---------------- */
 function buildQuiz(cat) {
   const pool = quizByCat[cat];
   const n = quizCountFor(curLevel, cat);
@@ -11887,12 +11788,9 @@ function buildQuiz(cat) {
 }
 
 /* ---------------- recording studio ---------------- */
-/* IndexedDB persistence: recordings survive closing the tab/browser, since
-   nobody records 300 words in one sitting. Keyed as "<wordId>_<target>",
-   target is "word" for now (sentence recording can reuse this later). */
 const DB_NAME = "hsktime-recordings", STORE_NAME = "clips";
 let dbPromise = null;
-Z
+
 function openDB() {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve, reject) => {
@@ -11942,7 +11840,7 @@ async function dbDelete(key) {
   });
 }
 
-let recordedSet = new Set(); // word IDs with a saved "word" recording
+let recordedSet = new Set();
 async function refreshRecordedSet() {
   try {
     const all = await dbGetAll();
@@ -12027,7 +11925,7 @@ function showFlagList() {
   $("closeFlagsBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
 }
 
-/* ZIP export via JSZip (loaded from CDN on demand) */
+/* ZIP export via JSZip */
 let jszipPromise = null;
 function loadJSZip() {
   if (window.JSZip) return Promise.resolve(window.JSZip);
@@ -12074,40 +11972,10 @@ async function exportZip() {
 }
 
 /* ---------------- levels & premium lock ---------------- */
-/* Only HSK1 has verified, PDF-sourced vocabulary right now. The others are
-   wired up and ready, but intentionally left unpopulated rather than
-   shipping unverified word lists in a paid product — see chat notes. */
-/* 녹음 탭은 척척맘님(콘텐츠 제작자)만 쓰는 도구예요. 학생들에게 배포하는
-   최종본을 만들 때는 이 값을 false로 바꾸면 녹음 탭이 아예 안 보여요.
-   나중에 예문 녹음이나 다른 급수 추가할 때 다시 true로 켜면 돼요. */
 const CREATOR_MODE = false;
-
-/* ---------------- 이용권(코드) 시스템 ----------------
-   [2026.08 변경] 코드 검증을 전부 서버(Supabase)로 옮겼어요.
-
-   이전 버전은 코드 생성 로직이 이 파일 안에 있어서, 브라우저
-   개발자도구 콘솔에서 누구나 무료로 프리미엄 코드를 만들어낼 수
-   있었어요. 지금은 그 함수들이 이 파일에 아예 없고, 검증은
-   Postgres 함수(redeem_code)가 담당해요.
-
-   관련 코드는 hsk-auth.js 와 supabase_schema.sql 을 보세요.
-   ---------------------------------------------------------- */
-
-/* 테스트 모드 스위치
-   ------------------------------------------------------------
-   false → 로그인 없이도 모든 급수가 열려요 (설정 점검용)
-   true  → 실제 잠금 작동. 로그인 + 이용권이 있어야 2급부터 열려요
-
-   Supabase 설정을 마치고 로그인·코드등록이 정상 작동하는 걸
-   확인한 다음 true 로 바꾸세요. */
 const LOCK_ENABLED = false;
-
-/* 실제 스마트스토어(또는 자체 결제) 상품 페이지 주소로 바꿔주세요 */
 const SMART_STORE_URL = "https://smartstore.naver.com/여기에_스토어주소";
 
-/* ---------------- 요금제 & 구독 상태 ---------------- */
-/* 구독 상태는 서버(Supabase)에서 받아온 값만 신뢰해요.
-   localStorage 를 조작해도 실제 권한은 바뀌지 않아요. */
 function isSubscribed() {
   return !!(window.HSKAuth && window.HSKAuth.isSubscribed);
 }
@@ -12118,18 +11986,16 @@ function subDaysLeft() {
   return (window.HSKAuth && window.HSKAuth.daysLeft) ? window.HSKAuth.daysLeft() : 0;
 }
 function hasAccessToLevel(lv) {
-  if (!lv.locked) return true;         // 1급은 언제나 무료
-  if (!LOCK_ENABLED) return true;      // 테스트 모드
+  if (!lv.locked) return true;
+  if (!LOCK_ENABLED) return true;
   return isSubscribed();
 }
-
 
 const LEVELS = [
   { id: "hsk1", label: "1급", sub: "300단어 · 무료", locked: false, hasData: true },
   { id: "hsk2", label: "2급", sub: "200단어", locked: true, hasData: true },
   { id: "hsk3", label: "3급", sub: "500단어", locked: true, hasData: true },
-  { id: "hsk4", label: "4급", sub: "1000단어", locked: true, hasData: true },
-  { id: "hsk5", label: "5급", sub: "1600단어", locked: true, hasData: true },
+  { id: "hsk4", label: "4급", sub: "1000단어", locked: true, hasData: true },  { id: "hsk5", label: "5급", sub: "1600단어", locked: true, hasData: true },
   { id: "hsk6", label: "6급", sub: "1800단어", locked: true, hasData: true },
   { id: "hsk79", label: "7-9급", sub: "5,600단어 · 고급", locked: true, hasData: true },
 ];
