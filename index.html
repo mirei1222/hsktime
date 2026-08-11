@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>HSK_time · HSK3.0(新개정) 1~9급 단어장</title>
@@ -26,6 +29,12 @@ body{display:flex;justify-content:center;min-height:100vh;}
   box-shadow:0 0 14px rgba(255,77,94,.25);}
 .subtitle{color:var(--muted);font-size:12.5px;margin:0 0 16px;}
 .subtitle em{color:var(--gold);font-style:normal;font-weight:700;}
+
+/* 👇 예문 텍스트에 기기 공통 깔끔한 구글 중국어/한국어 폰트 적용 */
+.sentHanzi, .sentPinyin, .sentKorean {
+  font-family: 'Noto Sans SC', 'Noto Sans KR', sans-serif !important;
+}
+</style>
 
 /* ---- lantern-mood brand banner ---- */
 .banner{position:relative;border-radius:20px;overflow:hidden;padding:22px 18px 20px;margin-bottom:14px;
@@ -12304,9 +12313,15 @@ function renderStudy() {
   $("pinyin").textContent = w[2];
   $("korean").textContent = w[3];
   $("posBadge").textContent = w[4];
-  $("sentHanzi").textContent = w[6];
-  $("sentPinyin").textContent = w[7];
-  $("sentKorean").textContent = w[8];
+
+  // 대화문(B:) 줄바꿈 처리 함수
+  const formatDialog = (text) => text ? text.replace(/\s?B:/g, "<br>B:") : "";
+
+  // textContent를 innerHTML로 변경하여 줄바꿈 태그(<br>)가 적용되도록 수정
+  $("sentHanzi").innerHTML = formatDialog(w[6]);
+  $("sentPinyin").innerHTML = formatDialog(w[7]);
+  $("sentKorean").innerHTML = formatDialog(w[8]);
+
   $("studyBar").style.width = ((idx + 1) / deck.length * 100) + "%";
   $("studyCount").textContent = (idx + 1) + " / " + deck.length;
   showStroke = false;
@@ -12315,6 +12330,13 @@ function renderStudy() {
   $("strokeToggleBtn").textContent = "✍️ 획순 보기";
   $("strokeToggleBtn").classList.remove("on");
   markWordStudied(w[0]);
+
+  // 첫 번째 단어(idx === 0)일 때 이전 버튼 숨김 처리
+  if (idx === 0) {
+    $("prevBtn").style.visibility = "hidden";
+  } else {
+    $("prevBtn").style.visibility = "visible";
+  }
 }
 $("hanzi").onclick = () => speakWord(deck[idx]);
 $("ttsBtn").onclick = () => speakWord(deck[idx]);
@@ -12335,47 +12357,64 @@ $("nextBtn").onclick = () => { if (idx < deck.length - 1) { idx++; renderStudy()
 $("shuffleBtn").onclick = () => { deck = shuffle(deck); idx = 0; renderStudy(); };
 $("studyBack").onclick = () => show("catScreen");
 
-function startQuiz(cat) { curCat = cat; quizQs = buildQuiz(cat); qIdx = 0; score = 0; $("quizCat").textContent = cat + " 도전"; show("quizScreen"); renderQuiz(); }
 function renderQuiz() {
   answered = false;
   const item = quizQs[qIdx];
   const sent = item.word[6], target = item.word[1];
   const at = sent.indexOf(target);
+
+  // 1. 대화문(B:) 줄바꿈 처리 함수
+  const formatDialog = (text) => text ? text.replace(/\s?B:/g, "<br>B:") : "";
+
   $("qcard").className = "qcard";
-  $("sentence").innerHTML = (at >= 0 ? sent.slice(0, at) : sent) + '<span class="blank kaiti" id="blank">&nbsp;</span>' + (at >= 0 ? sent.slice(at + target.length) : "");
-  $("trans").textContent = item.word[8];
+
+  // 2. kaiti 클래스 제거 및 예문 문장에 formatDialog 적용
+  const rawSent = (at >= 0 ? sent.slice(0, at) : sent) + '<span class="blank" id="blank">&nbsp;</span>' + (at >= 0 ? sent.slice(at + target.length) : "");
+  $("sentence").innerHTML = formatDialog(rawSent);
+
+  // 3. textContent를 innerHTML로 변경하고 formatDialog 적용
+  $("trans").innerHTML = formatDialog(item.word[8]);
+
   $("qfeedback").textContent = ""; $("qfeedback").className = "qfeedback";
   $("quizBar").style.width = (qIdx / quizQs.length * 100) + "%";
-  $("quizCount").textContent = "문제 " + (qIdx + 1) + " / " + quizQs.length + "  ·  ✅ " + score;
+  $("quizCount").textContent = "문제 " + (qIdx + 1) + " / " + quizQs.length + "  ✅ " + score;
+  
   const box = $("choices"); box.innerHTML = "";
   item.options.forEach((opt) => {
     const b = document.createElement("button");
     b.innerHTML = `<span class="ch-hz kaiti">${opt[1]}</span><span class="ch-py">${opt[2]}</span>`;
-    b.onclick = () => pick(b, opt[1], target, sent);
+    
+    // 🚨 오디오 버그 수정: sent(텍스트) 대신 item.word(배열 전체)를 넘겨줍니다.
+    b.onclick = () => pick(b, opt[1], target, item.word);
+    
     box.appendChild(b);
   });
 }
-function pick(btn, chosen, ans, snt) {
+
+// 🚨 파라미터 snt -> wordData로 변경
+function pick(btn, chosen, ans, wordData) {
   if (answered) return; answered = true;
   const ok = chosen === ans;
   const blank = $("blank");
   blank.textContent = ans;
   blank.classList.add(ok ? "g" : "b");
+  
   document.querySelectorAll("#choices button").forEach((b) => {
     b.disabled = true;
     if (b === btn) b.classList.add(ok ? "pg" : "pb");
     if (b.querySelector(".ch-hz").textContent === ans) b.classList.add("rv");
   });
+  
   $("qcard").classList.add(ok ? "good" : "bad");
   $("qfeedback").textContent = ok ? "정답! 잘했어요 🎉" : "아쉬워요! 정답은 「" + ans + "」";
   $("qfeedback").className = "qfeedback " + (ok ? "g" : "b");
   if (ok) { score++; sndGood(); } else { sndBad(); }
-  speak(snt);
+  
+  // 🚨 오디오 버그 수정: 배열 전체와 'sentence' 타입을 정확히 넘겨줍니다.
+  speak(wordData, 'sentence'); 
+  
   setTimeout(() => { qIdx++; if (qIdx >= quizQs.length) showScore(); else renderQuiz(); }, 1500);
-}
-$("quizBack").onclick = () => show("catScreen");
-
-/* ---------------- recording studio screen ---------------- */
+}/* ---------------- recording studio screen ---------------- */
 let recDeck = [], recIdx = 0;
 function startRecord(cat) {
   curCat = cat; recDeck = [...byCat[cat]]; recIdx = 0;
