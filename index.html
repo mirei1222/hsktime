@@ -12355,6 +12355,27 @@ $("nextBtn").onclick = () => { if (idx < deck.length - 1) { idx++; renderStudy()
 $("shuffleBtn").onclick = () => { deck = shuffle(deck); idx = 0; renderStudy(); };
 $("studyBack").onclick = () => show("catScreen");
 
+function startQuiz(cat) {
+  curCat = cat;
+  score = 0;
+  qIdx = 0;
+  
+  // 카테고리별(또는 전체학습) 퀴즈 데이터를 생성하는 로직
+  const rawList = (cat === "전체학습") ? (allWordsByLevel[curLevel] || []) : (byCat[cat] || []);
+  
+  quizQs = rawList.map((word) => {
+    // 오답 보기를 만들기 위해 현재 급수/카테고리에서 다른 단어들 추출
+    const others = rawList.filter((w) => w[0] !== word[0]);
+    const shuffledOthers = shuffle([...others]).slice(0, 3);
+    const options = shuffle([word, ...shuffledOthers]);
+    return { word, options };
+  });
+
+  quizQs = shuffle(quizQs);
+  show("quizScreen");
+  renderQuiz();
+}
+
 function renderQuiz() {
   answered = false;
   const item = quizQs[qIdx];
