@@ -12318,8 +12318,7 @@ function renderStudy() {
 }
 $("hanzi").onclick = () => speakWord(deck[idx]);
 $("ttsBtn").onclick = () => speakWord(deck[idx]);
-$("sentTtsBtn").onclick = () => speak(deck[idx][6]);
-$("strokeToggleBtn").onclick = () => {
+$("sentTtsBtn").onclick = () => speak(deck[idx], 'sentence');$("strokeToggleBtn").onclick = () => {
   showStroke = !showStroke;
   const panel = $("strokePanel");
   const btn = $("strokeToggleBtn");
@@ -12429,8 +12428,7 @@ function renderRecordControls(state, errMsg) {
 }
 $("flagBtn").onclick = () => toggleFlag(recDeck[recIdx][0]);
 $("flagNoteInput").oninput = (e) => setFlagNote(recDeck[recIdx][0], e.target.value);
-$("recSentTtsBtn").onclick = () => speak(recDeck[recIdx][6]);
-$("recPrevBtn").onclick = () => { stopRec(); if (recIdx > 0) { recIdx--; renderRecord(); } };
+$("recSentTtsBtn").onclick = () => speak(recDeck[recIdx], 'sentence');$("recPrevBtn").onclick = () => { stopRec(); if (recIdx > 0) { recIdx--; renderRecord(); } };
 $("recNextBtn").onclick = () => { stopRec(); if (recIdx < recDeck.length - 1) { recIdx++; renderRecord(); } };
 $("recordBack").onclick = () => { stopRec(); show("catScreen"); renderCats(); };
 $("viewFlagsBtn").onclick = showFlagList;
