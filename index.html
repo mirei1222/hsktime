@@ -12430,10 +12430,40 @@ function pick(btn, chosen, ans, wordData) {
   if (ok) { score++; sndGood(); } else { sndBad(); }
   
   // 🚨 오디오 버그 수정: 배열 전체와 'sentence' 타입을 정확히 넘겨줍니다.
-  speak(wordData, 'sentence'); 
+speak(wordData, 'sentence'); 
   
-  setTimeout(() => { qIdx++; if (qIdx >= quizQs.length) showScore(); else renderQuiz(); }, 1500);
-}/* ---------------- recording studio screen ---------------- */
+  setTimeout(() => { 
+    qIdx++; 
+    if (qIdx >= quizQs.length) showScore(); 
+    else renderQuiz(); 
+  }, 1500);
+}
+
+function startQuiz(cat) {
+  curCat = cat;
+  score = 0;
+  qIdx = 0;
+  
+  let rawList = [];
+  if (cat === "전체학습") {
+    rawList = CATS.reduce((acc, c) => acc.concat(byCat[c.name] || []), []);
+  } else {
+    rawList = byCat[cat] || [];
+  }
+  
+  quizQs = rawList.map((word) => {
+    const others = rawList.filter((w) => w[0] !== word[0]);
+    const shuffledOthers = shuffle([...others]).slice(0, 3);
+    const options = shuffle([word, ...shuffledOthers]);
+    return { word, options };
+  });
+
+  quizQs = shuffle(quizQs);
+  show("quizScreen");
+  renderQuiz();
+}
+
+/* ---------------- recording studio screen ---------------- */
 let recDeck = [], recIdx = 0;
 function startRecord(cat) {
   curCat = cat; recDeck = [...byCat[cat]]; recIdx = 0;
