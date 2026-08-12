@@ -56,8 +56,9 @@ body{display:flex;justify-content:center;min-height:100vh;}
 .bannerTitle b{color:var(--accent);}
 .bannerTitle span{color:#FFD8DE;font-weight:700;}
 .bannerTag{color:#D8B9C2;font-size:11.5px;margin-top:4px;}
-.hsk3tag{color:#FFE3E9;font-weight:800;letter-spacing:.1px;margin-top:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(9px, 2.9vw, 12.5px);}
+.hsk3tag{color:#FFE3E9;font-weight:800;letter-spacing:.1px;margin-top:10px;position:relative;z-index:1;
+  white-space:normal;line-height:1.35;font-size:clamp(10px, 3.2vw, 13.5px);}
+.hsk3Emph{color:var(--gold);font-weight:900;font-size:1.18em;letter-spacing:.2px;}
 .bannerTextCol{min-width:0;flex:1;}
 .ytBtn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
   color:#fff;text-decoration:none;font-size:11.5px;font-weight:700;padding:7px 12px 7px 8px;border-radius:99px;
@@ -67,29 +68,43 @@ body{display:flex;justify-content:center;min-height:100vh;}
 .ytIcon i{width:0;height:0;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;border-left:6px solid #fff;margin-left:1.5px;}
 
 /* ---- daily progress ---- */
-.dailyBox{position:relative;z-index:1;margin-top:16px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.1);
-  border-radius:14px;padding:12px 14px;}
+.dailyBox{position:relative;z-index:1;margin:0 0 14px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.35);
+  border-radius:16px;padding:12px 14px;}
 .dailyTop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;}
-.dailyLabel{font-size:11.5px;color:#E8C4CC;font-weight:700;}
-.dailyCount{font-size:12px;color:#fff;font-weight:900;}
-.dailyCount small{color:#D8B9C2;font-weight:600;}
+.dailyLabel{font-size:11.5px;color:var(--muted);font-weight:700;}
+.dailyCount{font-size:12px;color:var(--ink);font-weight:900;}
+.dailyCount small{color:var(--muted);font-weight:600;}
 .dailyTrack{height:7px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
 .dailyFill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:99px;transition:width .4s ease;}
 .dailyDone{color:var(--gold);font-size:11px;margin-top:6px;}
 
-/* ---- level selector ---- */
-.levelGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.levelCard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;
-  padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.levelCard:active{transform:scale(.97);}
-.levelCard.locked{opacity:.72;}
-.levelCard .lv{font-size:20px;font-weight:900;color:var(--ink);}
-.levelCard.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
-.levelCard .lvSub{font-size:10.5px;color:var(--muted);}
-.lockBadge{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:6px;background:rgba(0,0,0,.4);
-  display:flex;align-items:center;justify-content:center;font-size:10px;}
-.freeBadge{position:absolute;top:8px;right:8px;font-size:9px;font-weight:800;color:var(--good);
-  background:rgba(62,220,151,.12);border:1px solid rgba(62,220,151,.35);border-radius:99px;padding:2px 6px;}
+/* ---- level selector (glass blob card) ---- */
+.levelGrid{display:flex;flex-direction:column;gap:6px;}
+.levelCard{position:relative;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:6px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  clip-path:inset(0 round 16px);-webkit-clip-path:inset(0 round 16px);isolation:isolate;
+  box-shadow:0 8px 32px rgba(0,0,0,.2),0 0 18px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .2s ease;cursor:pointer;}
+.levelCard:active{transform:scale(.98);}
+.levelCard.locked{opacity:.6;}
+.lvBadgeWrap{width:58px;height:58px;display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0;overflow:hidden;}
+.lvBlob{width:100%;height:100%;border-radius:42% 58% 54% 46% / 46% 48% 52% 54%;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-weight:800;font-size:1.05rem;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+.levelCard .lvInfo{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.levelCard .lvHeader{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.levelCard .lvTier{font-size:1.05rem;font-weight:700;color:#fff;}
+.levelCard .lvCnt{font-size:.72rem;color:rgba(255,255,255,.55);font-weight:500;}
+.levelCard .lvSub{font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.2;word-break:keep-all;}
+.freeBadge{background:rgba(46,204,113,.2);color:#3EDC97;font-size:.68rem;font-weight:700;padding:2px 6px;
+  border-radius:6px;}
+.lockBadge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.08);color:#fff;margin-left:10px;flex-shrink:0;font-size:13px;}
+.actionBtn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  margin-left:10px;flex-shrink:0;}
+.actionBtn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 
 /* ---- premium popup ---- */
 .premPop{background:linear-gradient(180deg,#1B0E14,#171921);border:1px solid rgba(255,120,140,.3);}
@@ -119,11 +134,23 @@ body{display:flex;justify-content:center;min-height:100vh;}
 .tabs button{flex:1;border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:700;padding:11px 2px;border-radius:11px;cursor:pointer;white-space:nowrap;}
 .tabs button.on{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(255,77,94,.35);}
 
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.cat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 14px;cursor:pointer;
+.cats{display:flex;flex-direction:column;gap:8px;}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:8px;}
-.cat.wide{grid-column:1 / -1;flex-direction:row;justify-content:center;gap:14px;padding:14px 18px;
-  border-color:rgba(255,120,140,.3);background:linear-gradient(90deg,rgba(255,77,94,.1),rgba(245,196,83,.06));}
+.cat.wide{grid-column:unset;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;}
+.cat.wide .wideText{flex:1;min-width:0;}
+.catArrow{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.08);flex-shrink:0;}
+.catArrow svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.cat.wide .glyph{font-size:24px;}
+.cat.wide .name{font-size:13.5px;}
+.cat.wide .name .catCnt{font-size:11px;font-weight:600;color:var(--muted);}
+.cat.wide .cnt{font-size:10.5px;}
+.cat.special{border-color:rgba(255,120,140,.3);background:linear-gradient(90deg,rgba(255,77,94,.1),rgba(245,196,83,.06));
+  padding:18px 18px;gap:16px;}
+.cat.special .glyph{font-size:34px;}
+.cat.special .name{font-size:16px;}
+.cat.special .cnt{font-size:12px;}
 .cat.wide .glyph{font-size:30px;}
 .cat.wide .wideText{display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
 .cat.wide .name{font-size:15px;}
@@ -191,9 +218,12 @@ body{display:flex;justify-content:center;min-height:100vh;}
 
 /* ---- 상단 홈/마이페이지 탭 ---- */
 .topNav{display:flex;gap:8px;margin-bottom:14px;}
-.topNavBtn{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--muted);
-  border-radius:12px;padding:10px 0;font-size:13px;font-weight:700;cursor:pointer;}
-.topNavBtn.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.topNavBtn{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--muted);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-radius:14px;padding:11px 0;font-size:13px;font-weight:700;cursor:pointer;transition:transform .15s ease;}
+.topNavBtn:active{transform:scale(.96);}
+.topNavBtn.on{background:linear-gradient(135deg,var(--accent),#C8102E);border-color:transparent;color:#fff;
+  box-shadow:0 6px 18px rgba(255,77,94,.35),inset 0 1px 0 rgba(255,255,255,.35);}
 .myPageTitle{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:12px;}
 .buyBtn{width:100%;background:linear-gradient(90deg,var(--accent),#C8102E);color:#fff;border:0;
   border-radius:12px;padding:13px 0;font-size:14px;font-weight:800;cursor:pointer;margin:6px 0 4px;}
@@ -384,12 +414,21 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     <div class="bannerTop">
       <div class="bannerTextCol">
         <div class="bannerTitle"><b>HSK</b><span>_time</span></div>
-        <div class="bannerTag hsk3tag">최신 개정 신판 HSK 3.0 요강 완벽 반영!</div>
       </div>
       <a class="ytBtn" href="https://www.youtube.com/@HSK_time" target="_blank" rel="noopener noreferrer">
         <span class="ytIcon"><i></i></span> 채널 구독
       </a>
     </div>
+    <div class="bannerTag hsk3tag"><span class="hsk3Emph">HSK3.0(新개정)</span> 공식 대강 기반</div>
+  </div>
+
+  <div class="topNav" id="topNav">
+    <button class="topNavBtn on" id="navHomeBtn">🏠 홈</button>
+    <button class="topNavBtn" id="navMyBtn">👤 마이페이지</button>
+    <button class="topNavBtn" id="navShopBtn">📚 자료실</button>
+  </div>
+
+  <div id="levelScreen">
     <div class="dailyBox">
       <div class="dailyTop">
         <span class="dailyLabel">🔥 오늘의 학습 목표</span>
@@ -398,29 +437,14 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       <div class="dailyTrack"><div class="dailyFill" id="dailyFill" style="width:0%"></div></div>
       <div class="dailyDone hidden" id="dailyDoneMsg">🎉 오늘 목표 달성! 대단해요</div>
     </div>
-  </div>
-
-  <div class="topNav" id="topNav">
-    <button class="topNavBtn on" id="navHomeBtn">🏠 홈</button>
-    <button class="topNavBtn" id="navMyBtn">👤 마이페이지</button>
-  </div>
-
-  <div id="levelScreen">
     <div class="levelGrid" id="levelGrid"></div>
-    <p class="hintline">1급은 무료로 전부 확인할 수 있어요. 2급부터는 로그인 후 이용권을 등록하면 열려요 ✨</p>
   </div>
 
   <div id="myPageScreen" class="hidden">
     <div class="myPageTitle">마이페이지</div>
 <div class="authBox" id="authBox">
       <div id="authLoggedOut">
-        <div class="authTitle">🔐 로그인하고 이용권 사용하기</div>
-        <div class="authSub">계정에 이용권이 저장돼요. 휴대폰을 바꾸거나 브라우저 기록을 지워도 그대로 유지됩니다.</div>
-        <button class="googleBtn" id="googleLoginBtn">
-          <svg class="gLogo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.1 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.7 6.9l7.6 5.9c4.400-4.1 6.8-10.1 6.8-17.3z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.7-2.9-.7-4.7s.3-3.3.7-4.7l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-3.6-13.5-8.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-          Google로 계속하기
-        </button>
-        <div class="authDivider">또는 이메일로</div>
+        <div class="authTitle">로그인</div>
         <div class="authRow">
           <input class="authInput" id="authEmail" type="email" placeholder="이메일" autocomplete="email">
           <input class="authInput" id="authPassword" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password">
@@ -430,6 +454,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
           </div>
         </div>
         <button class="authLink" id="forgotPwBtn">비밀번호를 잊으셨나요?</button>
+        <div class="authDivider">또는</div>
+        <button class="googleBtn" id="googleLoginBtn">
+          <svg class="gLogo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.1 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.7 6.9l7.6 5.9c4.400-4.1 6.8-10.1 6.8-17.3z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.7-2.9-.7-4.7s.3-3.3.7-4.7l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-3.6-13.5-8.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+          Google로 계속하기
+        </button>
         <div class="authMsg" id="authMsg"></div>
       </div>
       <div id="authLoggedIn" class="hidden">
@@ -461,7 +490,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     <button id="tabStudy" class="on">📖 학습</button>
     <button id="tabQuiz">⚡ 퀴즈</button>
     <button id="tabRecord">🎙️ 녹음</button>
-    <button id="tabShop">🔥 자료실</button>
   </div>
 
   <div id="catScreen" class="hidden">
@@ -541,12 +569,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   </div>
 
   <div id="shopScreen" class="hidden">
-    <div class="crumb"><button class="backbtn" id="shopBack">뒤로가기</button><span class="catlabel">🔥 비법 자료실</span></div>
     <p class="hintline shopIntro">앱 멤버십과는 별도로 구매하는 PDF 자료예요. 상세 내용과 결제는 판매 페이지에서 진행돼요.</p>
     <div class="shopGrid" id="shopGrid"></div>
   </div>
 
-  <div class="footer">HSK_time · HSK3.0(新개정) 공식 대강 기반<br><a href="guide.html" style="color:#6b6f82;">HSK 가이드</a> · <a href="about.html" style="color:#6b6f82;">소개</a> · <a href="privacy.html" style="color:#6b6f82;">개인정보처리방침</a> · <a href="contact.html" style="color:#6b6f82;">문의</a></div>
+  <div class="footer">HSK_time<br><a href="guide.html" style="color:#6b6f82;">HSK 가이드</a> · <a href="about.html" style="color:#6b6f82;">소개</a> · <a href="privacy.html" style="color:#6b6f82;">개인정보처리방침</a> · <a href="contact.html" style="color:#6b6f82;">문의</a></div>
 </div>
 <div id="popupWrap" class="hidden"></div>
 
@@ -11560,10 +11587,10 @@ const WORDS_BY_LEVEL = {
 
 const CATS = [
   { name: "전체학습", glyph: "全", desc: "전체 단어 한번에", wide: true },
-  { name: "명사", glyph: "名", desc: "사물·사람·장소" },
-  { name: "대명사/기능어", glyph: "代", desc: "대명사·조사·개사" },
-  { name: "동사/형용사", glyph: "动", desc: "동작·상태" },
-  { name: "부사/기타", glyph: "副", desc: "부사·수사·양사·표현" },
+  { name: "명사", glyph: "名", desc: "사물·사람·장소", color: "#3498db" },
+  { name: "대명사/기능어", glyph: "代", desc: "대명사·조사·개사", color: "#9b59b6" },
+  { name: "동사/형용사", glyph: "动", desc: "동작·상태", color: "#2ecc71" },
+  { name: "부사/기타", glyph: "副", desc: "부사·수사·양사·표현", color: "#e67e22" },
 ];
 function computeByCat(levelId) {
   const words = WORDS_BY_LEVEL[levelId] || [];
@@ -11987,12 +12014,13 @@ function hasAccessToLevel(lv) {
 }
 
 const LEVELS = [
-  { id: "hsk1", label: "1급", sub: "300단어 · 무료", locked: false, hasData: true },
-  { id: "hsk2", label: "2급", sub: "200단어", locked: true, hasData: true },
-  { id: "hsk3", label: "3급", sub: "500단어", locked: true, hasData: true },
-  { id: "hsk4", label: "4급", sub: "1000단어", locked: true, hasData: true },  { id: "hsk5", label: "5급", sub: "1600단어", locked: true, hasData: true },
-  { id: "hsk6", label: "6급", sub: "1800단어", locked: true, hasData: true },
-  { id: "hsk79", label: "7-9급", sub: "5,600단어 · 고급", locked: true, hasData: true },
+  { id: "hsk1", label: "1급", tier: "초급", words: 300, cum: 300, desc: "기초 인사, 숫자·시간 등 간단한 표현", color: "#86EFAC", locked: false, hasData: true },
+  { id: "hsk2", label: "2급", tier: "초중급", words: 200, cum: 500, desc: "짧은 문장으로 일상 대화 가능", color: "#FDBA74", locked: true, hasData: true },
+  { id: "hsk3", label: "3급", tier: "중급", words: 500, cum: 1000, desc: "여행·생활 전반의 대화 가능", color: "#93C5FD", locked: true, hasData: true },
+  { id: "hsk4", label: "4급", tier: "중상급", words: 1000, cum: 2000, desc: "폭넓은 주제로 비교적 자유로운 대화", color: "#FCA5A5", locked: true, hasData: true },
+  { id: "hsk5", label: "5급", tier: "고급", words: 1600, cum: 3600, desc: "신문·방송 이해, 논리적 의견 표현", color: "#D8B4FE", locked: true, hasData: true },
+  { id: "hsk6", label: "6급", tier: "상급", words: 1800, cum: 5400, desc: "유창한 의사소통, 복잡한 주제 이해", color: "#FDE68A", locked: true, hasData: true },
+  { id: "hsk79", label: "7-9급", tier: "최상급", words: 5600, cum: 11000, desc: "원어민에 준하는 고급 구사, 전문 분야 활용", color: "#F9A8D4", locked: true, hasData: true },
 ];
 
 function renderLevels() {
@@ -12001,13 +12029,26 @@ function renderLevels() {
     const unlocked = hasAccessToLevel(lv);
     const el = document.createElement("div");
     el.className = "levelCard" + (!unlocked ? " locked" : "");
-    el.innerHTML = `${!unlocked ? '<span class="lockBadge">🔒</span>' : (lv.locked ? '<span class="freeBadge" style="color:#3EDC97;border-color:#3EDC97">✓</span>' : '<span class="freeBadge">FREE</span>')}
-      <span class="lv">${lv.label}</span><span class="lvSub">${lv.sub}</span>`;
+    el.innerHTML = `
+      <div class="lvBadgeWrap"><div class="lvBlob" style="background:${lv.color}CC;color:#1F2937">${lv.label}</div></div>
+      <div class="lvInfo">
+        <div class="lvHeader">
+          <span class="lvTier">${lv.tier}</span>
+          <span class="lvCnt">(${lv.words.toLocaleString()}단어)</span>
+          ${!unlocked ? "" : (lv.locked ? '<span class="freeBadge">✓</span>' : '<span class="freeBadge">FREE</span>')}
+        </div>
+        <div class="lvSub">${lv.desc}</div>
+      </div>
+      ${!unlocked
+        ? '<div class="lockBadge">🔒</div>'
+        : `<div class="actionBtn" style="background:${lv.color}A0"><svg viewBox="0 0 24 24" style="stroke:#1F2937"><path d="M9 18l6-6-6-6"/></svg></div>`}
+    `;
     el.onclick = () => tryEnterLevel(lv);
     g.appendChild(el);
   });
   renderSubStatus();
 }
+let pendingMode = "study";
 function tryEnterLevel(lv) {
   if (!hasAccessToLevel(lv)) { showPurchaseGuide(lv); return; }
   if (!lv.hasData) { showComingSoon(lv); return; }
@@ -12069,6 +12110,10 @@ function setTopNav(which) {
     $("navHomeBtn").classList.add("on");
     show("levelScreen");
     renderLevels();
+  } else if (which === "shop") {
+    $("navShopBtn").classList.add("on");
+    show("shopScreen");
+    renderShop();
   } else {
     $("navMyBtn").classList.add("on");
     show("myPageScreen");
@@ -12078,6 +12123,7 @@ function setTopNav(which) {
 }
 $("navHomeBtn").onclick = () => setTopNav("home");
 $("navMyBtn").onclick = () => setTopNav("mypage");
+$("navShopBtn").onclick = () => setTopNav("shop");
 $("buyLinkBtn").onclick = () => window.open(SMART_STORE_URL, "_blank", "noopener,noreferrer");
 
 /* ---------------- subscription status strip ---------------- */
@@ -12255,10 +12301,10 @@ function renderCats() {
     const recN = mode === "record" ? byCat[c.name].filter((w) => recordedSet.has(w[0])).length : 0;
     const countText = mode === "study" ? n + "단어" : mode === "quiz" ? quizCountFor(curLevel, c.name) + "문제" : recN + " / " + n + "개 녹음됨";
     const el = document.createElement("div");
-    el.className = "cat" + (c.wide ? " wide" : "");
-    el.innerHTML = c.wide
-      ? `<div class="glyph kaiti">${c.glyph}</div><div class="wideText"><div class="name">${c.name}</div><div class="cnt">${c.desc} · ${countText}</div></div>`
-      : `<div class="glyph kaiti">${c.glyph}</div><div class="name">${c.name}</div><div class="cnt">${c.desc} · ${countText}</div>`;
+    el.className = "cat wide" + (c.wide ? " special" : "");
+    if (c.color) el.style.background = c.color + "1c";
+    if (c.color) el.style.borderColor = c.color + "55";
+    el.innerHTML = `<div class="glyph kaiti"${c.color ? ` style="color:${c.color}"` : ""}>${c.glyph}</div><div class="wideText"><div class="name">${c.name} <span class="catCnt">(${countText})</span></div><div class="cnt">${c.desc}</div></div><div class="catArrow" style="${c.color ? `background:${c.color}66` : ""}"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>`;
     el.onclick = () => (mode === "study" ? startStudy(c.name) : mode === "quiz" ? startQuiz(c.name) : startRecord(c.name));
     g.appendChild(el);
   });
@@ -12288,21 +12334,18 @@ function renderShop() {
     g.appendChild(el);
   });
 }
-$("shopBack").onclick = () => { $("modeTabs").classList.add("hidden"); show("levelScreen"); };
 
 function setTab(m) {
   mode = m;
   $("tabStudy").classList.toggle("on", m === "study");
   $("tabQuiz").classList.toggle("on", m === "quiz");
   $("tabRecord").classList.toggle("on", m === "record");
-  $("tabShop").classList.toggle("on", m === "shop");
   if (m === "shop") { show("shopScreen"); renderShop(); }
   else { show("catScreen"); renderCats(); }
 }
 $("tabStudy").onclick = () => setTab("study");
 $("tabQuiz").onclick = () => setTab("quiz");
 $("tabRecord").onclick = () => setTab("record");
-$("tabShop").onclick = () => setTab("shop");
 
 function startStudy(cat) { curCat = cat; deck = [...byCat[cat]]; idx = 0; showStroke = false; $("studyCat").textContent = cat; show("studyScreen"); renderStudy(); }
 function renderStudy() {
