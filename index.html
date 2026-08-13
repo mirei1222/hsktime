@@ -254,9 +254,19 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .buyBtn:active{transform:scale(.98);}
 
 .redeemBox{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px;}
-.wrongNoteEntry{width:100%;display:flex;align-items:center;justify-content:space-between;
+.streakCard{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(245,196,83,.16),rgba(255,77,94,.08));
+  border:1px solid rgba(245,196,83,.3);border-radius:16px;padding:16px 18px;margin-bottom:14px;}
+.streakNum{font-size:34px;font-weight:900;color:var(--gold);line-height:1;}
+.streakInfo{flex:1;}
+.streakLabel{font-size:13px;font-weight:800;color:var(--ink);}
+.streakSub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.statRow{display:flex;gap:10px;margin-bottom:14px;}
+.statBox{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;}
+.statBox .sNum{font-size:20px;font-weight:900;color:var(--ink);}
+.statBox .sLbl{font-size:10.5px;color:var(--muted);margin-top:2px;}
+.wrongNoteEntry,.statNoteEntry{width:100%;display:flex;align-items:center;justify-content:space-between;
   background:rgba(255,196,83,.08);border:1px solid rgba(245,196,83,.3);border-radius:14px;
-  padding:14px 16px;margin-bottom:16px;color:var(--ink);font-size:14px;font-weight:800;cursor:pointer;}
+  padding:14px 16px;margin-bottom:12px;color:var(--ink);font-size:14px;font-weight:800;cursor:pointer;}
 .wneRight{display:flex;align-items:center;gap:8px;}
 .wneBadge{background:var(--gold);color:#3a2a06;font-size:11px;font-weight:900;border-radius:99px;padding:2px 8px;min-width:18px;text-align:center;}
 .wneRight svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
@@ -516,6 +526,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
   <div class="topNav" id="topNav">
     <button class="topNavBtn on" id="navHomeBtn"><span class="navEmoji">🏠</span><span class="navLabel"> 홈</span></button>
+    <button class="topNavBtn" id="navStudyBtn"><span class="navEmoji">📊</span><span class="navLabel"> 학습</span></button>
     <button class="topNavBtn" id="navShopBtn"><span class="navEmoji">🛍️</span><span class="navLabel"> 자료실</span></button>
     <button class="topNavBtn" id="navMyBtn"><span class="navEmoji">🙋</span><span class="navLabel"> 마이페이지</span></button>
   </div>
@@ -566,11 +577,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     </div>
     <div class="subStatusBox" id="subStatusBox"></div>
 
-    <button class="wrongNoteEntry hidden" id="wrongNoteEntryBtn">
-      <span class="wneLeft">📕 오답노트</span>
-      <span class="wneRight"><span class="wneBadge" id="wrongNoteBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
-    </button>
-
     <div class="redeemBox" id="redeemBox">
       <div class="redeemHead">🔑 구매 후 받은 코드가 있으신가요?</div>
       <div class="redeemRow">
@@ -583,6 +589,30 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     
     <button class="buyBtn" id="buyLinkBtn">🛒 이용권 구매하러 가기</button>
     <p class="hintline">구매 후 받은 코드를 위 칸에 입력해 주세요</p>
+  </div>
+
+  <div id="studyStatsScreen" class="hidden">
+    <div class="myPageTitle">학습</div>
+
+    <div class="streakCard">
+      <div class="streakNum" id="streakNum">0</div>
+      <div class="streakInfo">
+        <div class="streakLabel">🔥 연속 학습</div>
+        <div class="streakSub" id="streakSub">오늘 학습을 시작해보세요</div>
+      </div>
+    </div>
+
+    <div class="statRow" id="statRow"></div>
+
+    <button class="statNoteEntry" id="wrongNoteEntryBtn">
+      <span class="wneLeft">📕 오답노트</span>
+      <span class="wneRight"><span class="wneBadge" id="wrongNoteBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+    </button>
+
+    <button class="statNoteEntry" id="reviewStudiedBtn">
+      <span class="wneLeft">🔁 학습한 단어 복습</span>
+      <span class="wneRight"><span class="wneBadge" id="studiedBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+    </button>
   </div>
 
 
@@ -11727,9 +11757,7 @@ function removeWrongWord(id) {
 function updateWrongBadge() {
   const el = $("wrongNoteBadge");
   if (!el) return;
-  const n = getWrongList().length;
-  el.textContent = n;
-  $("wrongNoteEntryBtn").classList.toggle("hidden", n === 0);
+  el.textContent = getWrongList().length;
 }
 function renderWrongScreen() {
   const ids = getWrongList();
@@ -11918,11 +11946,6 @@ function tone(freq, dur, type, when, vol) {
 }
 const sndGood = () => { tone(659, .12, "sine", 0, .25); tone(880, .22, "sine", .1, .25); };
 const sndBad = () => { tone(180, .3, "square", 0, .12); };
-/* HTML onclick 함수 이름 호환용 코드 */
-function speakEx(entry) { speakSentence(entry); }
-function speakExample(entry) { speakSentence(entry); }
-function playSentence(entry) { speakSentence(entry); }
-function speakSent(entry) { speakSentence(entry); }
 
 /* ---------------- inline stroke order ---------------- */
 let hwPromise = null;
@@ -12346,15 +12369,19 @@ function setTopNav(which) {
     $("navShopBtn").classList.add("on");
     show("shopScreen");
     renderShop();
+  } else if (which === "study") {
+    $("navStudyBtn").classList.add("on");
+    show("studyStatsScreen");
+    renderStudyStats();
   } else {
     $("navMyBtn").classList.add("on");
     show("myPageScreen");
     renderAuthBox();
     renderSubStatus();
-    updateWrongBadge();
   }
 }
 $("navHomeBtn").onclick = () => setTopNav("home");
+$("navStudyBtn").onclick = () => setTopNav("study");
 $("navMyBtn").onclick = () => setTopNav("mypage");
 $("navShopBtn").onclick = () => setTopNav("shop");
 $("buyLinkBtn").onclick = () => window.open(SMART_STORE_URL, "_blank", "noopener,noreferrer");
@@ -12512,16 +12539,52 @@ function bindAuthUI() {
 
 /* ---------------- daily study progress (localStorage; resets each day) ---------------- */
 const DAILY_GOAL = 20;
-function todayKey() { return "hsktime-daily-" + new Date().toISOString().slice(0, 10); }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function todayKey() { return "hsktime-daily-" + todayStr(); }
 function loadDaily() {
   try { return JSON.parse(localStorage.getItem(todayKey()) || "[]"); } catch (e) { return []; }
 }
 function saveDaily(arr) {
   try { localStorage.setItem(todayKey(), JSON.stringify(arr)); } catch (e) {}
 }
+
+/* ---------------- 학습 통계: 전체 학습단어 + 연속학습일 ---------------- */
+const STUDIED_ALL_KEY = "hsk_studied_all";
+const STUDY_DATES_KEY = "hsk_study_dates";
+function getStudiedAll() {
+  try { return JSON.parse(localStorage.getItem(STUDIED_ALL_KEY) || "[]"); } catch (e) { return []; }
+}
+function addStudiedAll(id) {
+  const arr = getStudiedAll();
+  if (!arr.includes(id)) { arr.push(id); localStorage.setItem(STUDIED_ALL_KEY, JSON.stringify(arr)); }
+}
+function getStudyDates() {
+  try { return JSON.parse(localStorage.getItem(STUDY_DATES_KEY) || "[]"); } catch (e) { return []; }
+}
+function markStudyDateToday() {
+  const dates = getStudyDates();
+  const t = todayStr();
+  if (!dates.includes(t)) { dates.push(t); localStorage.setItem(STUDY_DATES_KEY, JSON.stringify(dates)); }
+}
+function computeStreak() {
+  const dateSet = new Set(getStudyDates());
+  if (!dateSet.size) return 0;
+  let streak = 0;
+  const d = new Date();
+  // 오늘 학습 기록이 없으면 어제부터 거슬러 셈 (오늘 아직 안 했어도 스트릭 유지)
+  if (!dateSet.has(todayStr())) d.setDate(d.getDate() - 1);
+  while (dateSet.has(d.toISOString().slice(0, 10))) {
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
 function markWordStudied(id) {
   const arr = loadDaily();
   if (!arr.includes(id)) { arr.push(id); saveDaily(arr); }
+  addStudiedAll(id);
+  markStudyDateToday();
   updateDailyUI();
 }
 function updateDailyUI() {
@@ -12532,13 +12595,32 @@ function updateDailyUI() {
   $("dailyDoneMsg").classList.toggle("hidden", loadDaily().length < DAILY_GOAL);
 }
 
+function renderStudyStats() {
+  const streak = computeStreak();
+  $("streakNum").textContent = streak;
+  $("streakSub").textContent = streak > 0 ? `최고예요! ${streak}일째 이어가는 중` : "오늘 학습을 시작해보세요";
+
+  const studiedN = getStudiedAll().length;
+  const wrongN = getWrongList().length;
+  $("statRow").innerHTML = `
+    <div class="statBox"><div class="sNum">${studiedN}</div><div class="sLbl">누적 학습 단어</div></div>
+    <div class="statBox"><div class="sNum">${wrongN}</div><div class="sLbl">오답노트</div></div>
+    <div class="statBox"><div class="sNum">${loadDaily().length}</div><div class="sLbl">오늘 학습</div></div>
+  `;
+
+  $("wrongNoteBadge").textContent = wrongN;
+  $("studiedBadge").textContent = studiedN;
+}
+$("wrongNoteEntryBtn").onclick = () => { show("wrongScreen"); renderWrongScreen(); };
+$("reviewStudiedBtn").onclick = () => { if (getStudiedAll().length) startFullReviewQuiz(); };
+
 /* ---------------- state ---------------- */
 let mode = "study", curCat = null;
 let deck = [], idx = 0, showStroke = false;
 let quizQs = [], qIdx = 0, score = 0, answered = false, qNextTimer = null;
 function advanceQuiz() { renderQuiz(); }
 
-function show(id) { ["levelScreen", "myPageScreen", "catScreen", "studyScreen", "quizScreen", "recordScreen", "shopScreen", "wrongScreen"].forEach((s) => $(s).classList.add("hidden")); $(id).classList.remove("hidden"); }
+function show(id) { ["levelScreen", "myPageScreen", "studyStatsScreen", "catScreen", "studyScreen", "quizScreen", "recordScreen", "shopScreen", "wrongScreen"].forEach((s) => $(s).classList.add("hidden")); $(id).classList.remove("hidden"); }
 
 function renderCats() {
   const g = $("catGrid"); g.innerHTML = "";
@@ -12719,22 +12801,22 @@ function startQuizPool(filterCat) {
   show("quizScreen");
   renderQuiz();
 }
-function startReviewQuiz() {
-  const ids = getWrongList();
+function startReviewQuizFromIds(ids, label) {
   if (!ids.length) return;
   reviewMode = true;
   quizFilter = "전체";
   score = 0; qCounter = 0; lastPickedId = null;
   quizWords = ids.map((id) => ALL_WORDS_BY_ID[id]).filter(Boolean).map((x) => x.word);
-  $("quizLevelLabel").textContent = "📕 오답노트 복습";
+  $("quizLevelLabel").textContent = label;
   $("quizFilterRow").classList.add("hidden");
   $("quizPreviewBadge").classList.add("hidden");
   updateQuizPoolInfo();
   show("quizScreen");
   renderQuiz();
 }
-$("wrongNoteEntryBtn").onclick = () => { show("wrongScreen"); renderWrongScreen(); };
-$("wrongBack").onclick = () => { show("myPageScreen"); };
+function startReviewQuiz() { startReviewQuizFromIds(getWrongList(), "📕 오답노트 복습"); }
+function startFullReviewQuiz() { startReviewQuizFromIds(getStudiedAll(), "🔁 전체 복습"); }
+$("wrongBack").onclick = () => { show("studyStatsScreen"); renderStudyStats(); };
 $("wrongReviewBtn").onclick = () => { if (getWrongList().length) startReviewQuiz(); };
 function updateQuizPoolInfo() {
   if (reviewMode) { $("quizPoolInfo").textContent = "오답노트 " + quizWords.length + "개 단어 반복 학습 중"; return; }
