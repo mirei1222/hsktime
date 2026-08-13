@@ -181,21 +181,23 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
   padding:14px;margin-bottom:14px;}
 .authTitle{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:10px;}
 .authSub{font-size:11.5px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
-.googleBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
-  background:#fff;color:#1F1F1F;border:0;border-radius:10px;padding:11px 0;
-  font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;}
-.googleBtn:active{transform:scale(.98);}
-.gLogo{width:16px;height:16px;flex-shrink:0;}
+.authTabs{display:flex;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:11px;
+  padding:3px;gap:3px;margin-bottom:12px;}
+.authTab{flex:1;border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:700;
+  padding:9px 0;border-radius:8px;cursor:pointer;}
+.authTab.on{background:var(--accent);color:#fff;}
 .authDivider{display:flex;align-items:center;gap:8px;color:var(--muted);
   font-size:10.5px;margin:10px 0;}
 .authDivider::before,.authDivider::after{content:"";flex:1;height:1px;background:var(--line);}
-.authRow{display:flex;flex-direction:column;gap:7px;}
+.authRow{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;}
 .authInput{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
   border-radius:10px;padding:10px 12px;font-size:13px;width:100%;}
 .authInput::placeholder{color:var(--muted);}
+.authInput.bad{border-color:var(--bad);}
 .authBtnRow{display:flex;gap:7px;}
 .authBtn{flex:1;border:0;border-radius:10px;padding:10px 0;font-size:12.5px;
   font-weight:700;cursor:pointer;background:var(--accent);color:#fff;}
+.authBtn.full{width:100%;}
 .authBtn.ghost{background:none;border:1px solid var(--line);color:var(--muted);}
 .authBtn:active{transform:scale(.98);}
 .authMsg{font-size:11.5px;margin-top:8px;line-height:1.5;min-height:1em;}
@@ -534,21 +536,25 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     <div class="myPageTitle">마이페이지</div>
 <div class="authBox" id="authBox">
       <div id="authLoggedOut">
-        <div class="authTitle">로그인</div>
-        <div class="authRow">
-          <input class="authInput" id="authEmail" type="email" placeholder="이메일" autocomplete="email">
-          <input class="authInput" id="authPassword" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password">
-          <div class="authBtnRow">
-            <button class="authBtn" id="emailLoginBtn">로그인</button>
-            <button class="authBtn ghost" id="emailSignupBtn">회원가입</button>
-          </div>
+        <div class="authTabs">
+          <button class="authTab on" id="authTabLogin">로그인</button>
+          <button class="authTab" id="authTabSignup">회원가입</button>
         </div>
-        <button class="authLink" id="forgotPwBtn">비밀번호를 잊으셨나요?</button>
-        <div class="authDivider">또는</div>
-        <button class="googleBtn" id="googleLoginBtn">
-          <svg class="gLogo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.1 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.7 6.9l7.6 5.9c4.400-4.1 6.8-10.1 6.8-17.3z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.7-2.9-.7-4.7s.3-3.3.7-4.7l-7.9-6.1C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-3.6-13.5-8.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-          Google로 계속하기
-        </button>
+
+        <div class="authRow" id="authFormLogin">
+          <input class="authInput" id="authEmail" type="email" placeholder="이메일" autocomplete="email">
+          <input class="authInput" id="authPassword" type="password" placeholder="비밀번호" autocomplete="current-password">
+          <button class="authBtn full" id="emailLoginBtn">로그인</button>
+          <button class="authLink" id="forgotPwBtn">비밀번호를 잊으셨나요?</button>
+        </div>
+
+        <div class="authRow hidden" id="authFormSignup">
+          <input class="authInput" id="signupEmail" type="email" placeholder="이메일" autocomplete="email">
+          <input class="authInput" id="signupPassword" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="new-password">
+          <input class="authInput" id="signupPassword2" type="password" placeholder="비밀번호 확인" autocomplete="new-password">
+          <button class="authBtn full" id="emailSignupBtn">회원가입</button>
+        </div>
+
         <div class="authMsg" id="authMsg"></div>
       </div>
       <div id="authLoggedIn" class="hidden">
@@ -12437,14 +12443,19 @@ function renderAuthBox() {
   }
 }
 
+$("authTabLogin").onclick = () => {
+  $("authTabLogin").classList.add("on"); $("authTabSignup").classList.remove("on");
+  $("authFormLogin").classList.remove("hidden"); $("authFormSignup").classList.add("hidden");
+  setAuthMsg("", "");
+};
+$("authTabSignup").onclick = () => {
+  $("authTabSignup").classList.add("on"); $("authTabLogin").classList.remove("on");
+  $("authFormSignup").classList.remove("hidden"); $("authFormLogin").classList.add("hidden");
+  setAuthMsg("", "");
+};
+
 function bindAuthUI() {
   if (!window.HSKAuth) return;
-
-  $("googleLoginBtn").onclick = async () => {
-    setAuthMsg("구글 로그인 창으로 이동할게요...", "");
-    const r = await window.HSKAuth.signInWithGoogle();
-    if (!r.ok) setAuthMsg("❌ " + r.reason, "bad");
-  };
 
   $("emailLoginBtn").onclick = async () => {
     setAuthMsg("로그인 중...", "");
@@ -12455,10 +12466,17 @@ function bindAuthUI() {
   };
 
   $("emailSignupBtn").onclick = async () => {
+    const email = $("signupEmail").value.trim();
+    const pw = $("signupPassword").value;
+    const pw2 = $("signupPassword2").value;
+    $("signupPassword").classList.remove("bad"); $("signupPassword2").classList.remove("bad");
+
+    if (!email) { setAuthMsg("❌ 이메일을 입력해 주세요.", "bad"); return; }
+    if (pw.length < 6) { $("signupPassword").classList.add("bad"); setAuthMsg("❌ 비밀번호는 6자 이상이어야 해요.", "bad"); return; }
+    if (pw !== pw2) { $("signupPassword2").classList.add("bad"); setAuthMsg("❌ 비밀번호가 일치하지 않아요.", "bad"); return; }
+
     setAuthMsg("가입 중...", "");
-    const r = await window.HSKAuth.signUpWithEmail(
-      $("authEmail").value.trim(), $("authPassword").value
-    );
+    const r = await window.HSKAuth.signUpWithEmail(email, pw);
     if (!r.ok) { setAuthMsg("❌ " + r.reason, "bad"); return; }
     setAuthMsg(r.needsEmailConfirm ? "✉️ " + r.message : "✅ 가입 완료!", "ok");
   };
