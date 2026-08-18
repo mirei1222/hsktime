@@ -13,12 +13,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 /* ------------------------------------------------------------
  * 1. 설정 — Supabase 대시보드 > Project Settings > API 에서 복사
  *
+ *    ⚠️ 아래 두 값이 잘못 들어가 있었어요! 반드시 실제 값으로 교체하세요.
+ *    - SUPABASE_URL: "https://xxxxxxxxxxx.supabase.co" 형태 (Project URL)
+ *    - SUPABASE_ANON_KEY: "eyJ..."로 시작하는 긴 문자열 (anon public key)
+ *
  *    anon key는 공개돼도 괜찮은 키예요. RLS가 실제 방어선이라
  *    이 키만으로는 남의 데이터를 읽거나 구독을 늘릴 수 없어요.
  *    (service_role 키는 절대 여기 넣으면 안 돼요!)
  * ---------------------------------------------------------- */
 const SUPABASE_URL = "https://abskpzeitstjuxqgqvrp.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_jgqTaEWUhwzFKbKlMSKznA_IBavW_-g";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFic2twemVpdHN0anV4cWdxdnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMzIwNTAsImV4cCI6MjEwMTYwODA1MH0.-ddEtuHY9o5uu-FuzA1DauI0hhVmM8ycQTl_wb1sUHQ";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -178,6 +182,46 @@ async function redeemCode(code) {
 }
 
 /* ------------------------------------------------------------
+ * 4.5 학습기록 동기화 (누적 학습단어 / 연속학습일 / 오답노트 / 미리보기)
+ *     — 기기를 바꿔도 로그인하면 이어지도록
+ * ---------------------------------------------------------- */
+
+/** 클라우드에 저장된 내 학습기록을 가져옴. 아직 없으면 null */
+async function syncPull() {
+  if (!state.user) return null;
+
+  const { data, error } = await supabase
+    .from("user_learning_data")
+    .select("studied_all, study_dates, wrong_words, preview_seen")
+    .eq("user_id", state.user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("[HSKAuth] syncPull 오류:", error);
+    return null;
+  }
+  return data;
+}
+
+/** 로컬에서 병합한 학습기록을 클라우드에 저장(upsert) */
+async function syncPush(payload) {
+  if (!state.user) return;
+
+  const { error } = await supabase
+    .from("user_learning_data")
+    .upsert({
+      user_id: state.user.id,
+      studied_all: payload.studied_all,
+      study_dates: payload.study_dates,
+      wrong_words: payload.wrong_words,
+      preview_seen: payload.preview_seen,
+      updated_at: new Date().toISOString(),
+    });
+
+  if (error) console.warn("[HSKAuth] syncPush 오류:", error);
+}
+
+/* ------------------------------------------------------------
  * 5. 세션 감지 (새로고침·기기변경·쿠키삭제 후에도 복구)
  * ---------------------------------------------------------- */
 supabase.auth.onAuthStateChange(async (event, session) => {
@@ -247,6 +291,9 @@ const HSKAuth = {
   refreshSubscription,
   redeemCode,
   daysLeft,
+  // 학습기록 동기화
+  syncPull,
+  syncPush,
   // 상태
   onChange,
   get user() { return state.user; },
