@@ -338,6 +338,11 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .ddaySetupCard{background:var(--surface);border-radius:20px;padding:26px 22px;width:100%;max-width:360px;
   display:flex;flex-direction:column;gap:14px;text-align:left;}
 .ddayPeriodRow{display:flex;gap:8px;flex-wrap:wrap;}
+.ddayLevelLabel{font-size:12px;font-weight:700;color:var(--muted);margin-top:2px;}
+.ddayLevelRow{display:flex;gap:6px;flex-wrap:wrap;}
+.ddayLevelBtn{border:1px solid var(--line);background:rgba(255,255,255,.06);
+  color:var(--ink);padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;}
+.ddayLevelBtn.on{color:#1F2937;}
 .ddayPeriodBtn{flex:1;min-width:60px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);
   padding:10px 0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;}
 .ddayPeriodBtn.on{border-color:var(--accent);background:rgba(255,77,94,.18);color:#fff;}
@@ -353,8 +358,12 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .hskToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .dwbReshuffle{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
   border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;margin-right:6px;flex-shrink:0;}
+.dwbEdit{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
+  border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;margin-right:6px;flex-shrink:0;}
 .dmcReshuffle{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
   border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0;}
+.dmcEdit{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
+  border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0;margin-right:6px;}
 
 /* ---- HSK 시험일정 달력 ---- */
 .examCalBtn{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
@@ -12593,7 +12602,7 @@ function renderDdayWidget() {
     const daily = ddayDailyTarget(plan);
     btn.innerHTML = `<span>⚡ D-${daysLeft} · ${lv ? lv.label : ""} 벼락치기 진행 중</span>
       <span class="dwbRight">
-        ${unlocked ? `<button class="dwbReshuffle" id="dwbReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button> 오늘 ${daily}단어 →` : '<span class="dwbLock">🔒</span>'}
+        ${unlocked ? `<button class="dwbEdit" id="dwbEditBtn" title="급수·기간 변경">⚙️</button><button class="dwbReshuffle" id="dwbReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button> 오늘 ${daily}단어 →` : '<span class="dwbLock">🔒</span>'}
       </span>`;
   } else {
     btn.innerHTML = `<span>⚡ D-Day 벼락치기 설정</span>
@@ -12603,6 +12612,10 @@ function renderDdayWidget() {
     if (!unlocked) { showDdayLockedPopup(); return; }
     if (plan) { startDdayStudy(); } else { showDdaySetupPopup(); }
   };
+  const editBtn = $("dwbEditBtn");
+  if (editBtn) {
+    editBtn.onclick = (e) => { e.stopPropagation(); showDdaySetupPopup(); };
+  }
   const reBtn = $("dwbReshuffleBtn");
   if (reBtn) {
     reBtn.onclick = (e) => {
@@ -12628,7 +12641,7 @@ function renderDdayModeCard() {
     card.innerHTML = `<span class="dmcGlyph">⚡</span>
       <div class="dmcInfo"><div class="dmcTitle">D-${daysLeft} 벼락치기 모드 (Day ${dayNum})</div>
       <div class="dmcSub">오늘 ${daily}단어 무작위 학습</div></div>
-      ${unlocked ? '<button class="dmcReshuffle" id="dmcReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button>' : '<span class="dmcLock">🔒</span>'}`;
+      ${unlocked ? '<button class="dmcEdit" id="dmcEditBtn" title="급수·기간 변경">⚙️</button><button class="dmcReshuffle" id="dmcReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button>' : '<span class="dmcLock">🔒</span>'}`;
   } else {
     card.innerHTML = `<span class="dmcGlyph">🔥</span>
       <div class="dmcInfo"><div class="dmcTitle">D-Day 벼락치기 모드 (랜덤 셔플)</div>
@@ -12640,6 +12653,10 @@ function renderDdayModeCard() {
     if (!planForThisLevel) { showDdaySetupPopup(); return; }
     startDdayStudy();
   };
+  const dmcEditBtn = $("dmcEditBtn");
+  if (dmcEditBtn) {
+    dmcEditBtn.onclick = (e) => { e.stopPropagation(); showDdaySetupPopup(); };
+  }
   const dmcReBtn = $("dmcReshuffleBtn");
   if (dmcReBtn) {
     dmcReBtn.onclick = (e) => {
@@ -12672,16 +12689,19 @@ function showDdayLockedPopup() {
 function showDdaySetupPopup() {
   const wrap = $("popupWrap");
   wrap.className = "overlay";
-  const lv = LEVELS.find((l) => l.id === curLevel) || LEVELS[0];
-  const totalWords = (WORDS_BY_LEVEL[lv.id] || []).length;
   const existing = getDdayPlan();
-  const willOverwrite = existing && existing.levelId !== lv.id;
-  const existingLv = existing ? LEVELS.find((l) => l.id === existing.levelId) : null;
+  let selectedLevelId = (existing && existing.levelId) || curLevel;
+  const getLv = () => LEVELS.find((l) => l.id === selectedLevelId) || LEVELS[0];
+  const getTotalWords = () => (WORDS_BY_LEVEL[selectedLevelId] || []).length;
+
   wrap.innerHTML = `<div class="pop ddaySetupCard">
     <div class="bigemoji">⚡</div>
     <h2>D-Day 벼락치기 설정</h2>
-    <p class="premLine">${lv.label} 총 ${totalWords.toLocaleString()}단어를 목표 기간에 맞춰 매일 무작위로 나눠 드려요.</p>
-    ${willOverwrite ? `<p class="premLine" style="color:var(--bad);">⚠️ 현재 ${existingLv ? existingLv.label : ""} 벼락치기 계획이 진행 중이에요. 새로 설정하면 기존 계획은 사라져요.</p>` : ""}
+    <div class="ddayLevelLabel">급수 선택</div>
+    <div class="ddayLevelRow" id="ddayLevelRow">
+      ${LEVELS.map((l) => `<button class="ddayLevelBtn${l.id === selectedLevelId ? " on" : ""}" data-level="${l.id}" style="${l.id === selectedLevelId ? `background:${l.color};border-color:${l.color}` : `border-color:${l.color}80;background:${l.color}22`}">${l.label}</button>`).join("")}
+    </div>
+    <p class="premLine" id="ddayLevelDesc"></p>
     <div class="ddayPeriodRow">
       <button class="ddayPeriodBtn" data-days="7">7일</button>
       <button class="ddayPeriodBtn" data-days="15">15일</button>
@@ -12691,18 +12711,42 @@ function showDdaySetupPopup() {
     <input type="number" class="ddayCustomInput" id="ddayCustomDays" placeholder="직접 입력 (일수)" min="1" max="365">
     <div class="ddayPreview" id="ddayPreview">기간을 선택하면 하루 목표 단어 수를 보여드려요.</div>
     <div class="btns">
-      <button class="subBtn" id="ddayConfirmBtn">설정 완료</button>
+      <button class="subBtn" id="ddayConfirmBtn">${existing ? "변경 완료" : "설정 완료"}</button>
+      ${existing ? '<button class="closeBtn" id="ddayCancelPlanBtn" style="color:var(--bad);">계획 취소하기</button>' : ""}
       <button class="closeBtn" id="ddayCloseBtn">닫기</button>
     </div>
   </div>`;
 
-  let selectedDays = null;
+  let selectedDays = existing ? existing.totalDays : null;
+
+  const updateLevelDesc = () => {
+    const lv = getLv();
+    const willOverwrite = existing && existing.levelId !== selectedLevelId;
+    $("ddayLevelDesc").innerHTML = `${lv.label} 총 ${getTotalWords().toLocaleString()}단어를 목표 기간에 맞춰 매일 무작위로 나눠 드려요.`
+      + (willOverwrite ? `<br><span style="color:var(--bad);">⚠️ 기존 ${LEVELS.find((l) => l.id === existing.levelId).label} 계획은 사라져요.</span>` : "");
+  };
   const updatePreview = () => {
     if (!selectedDays || selectedDays < 1) { $("ddayPreview").textContent = "기간을 선택하면 하루 목표 단어 수를 보여드려요."; return; }
-    const daily = Math.ceil(totalWords / selectedDays);
-    $("ddayPreview").innerHTML = `<b>${lv.label}</b> ${totalWords.toLocaleString()}단어 ÷ ${selectedDays}일 = 하루 약 <b>${daily}단어</b>`;
+    const daily = Math.ceil(getTotalWords() / selectedDays);
+    $("ddayPreview").innerHTML = `<b>${getLv().label}</b> ${getTotalWords().toLocaleString()}단어 ÷ ${selectedDays}일 = 하루 약 <b>${daily}단어</b>`;
   };
+
+  document.querySelectorAll(".ddayLevelBtn").forEach((b) => {
+    b.onclick = () => {
+      selectedLevelId = b.dataset.level;
+      document.querySelectorAll(".ddayLevelBtn").forEach((x) => {
+        const xLv = LEVELS.find((l) => l.id === x.dataset.level);
+        const on = x === b;
+        x.classList.toggle("on", on);
+        x.style.background = on ? xLv.color : xLv.color + "22";
+        x.style.borderColor = on ? xLv.color : xLv.color + "80";
+      });
+      updateLevelDesc();
+      updatePreview();
+    };
+  });
   document.querySelectorAll(".ddayPeriodBtn").forEach((b) => {
+    if (existing && Number(b.dataset.days) === existing.totalDays) b.classList.add("on");
     b.onclick = () => {
       selectedDays = Number(b.dataset.days);
       document.querySelectorAll(".ddayPeriodBtn").forEach((x) => x.classList.remove("on"));
@@ -12721,12 +12765,27 @@ function showDdaySetupPopup() {
   };
   $("ddayConfirmBtn").onclick = () => {
     if (!selectedDays || selectedDays < 1) { $("ddayPreview").textContent = "⚠️ 기간을 선택하거나 입력해 주세요"; return; }
-    createDdayPlan(lv.id, selectedDays);
+    createDdayPlan(selectedLevelId, selectedDays);
     wrap.className = "hidden"; wrap.innerHTML = "";
     renderDdayWidget();
     if (!$("catScreen").classList.contains("hidden")) renderDdayModeCard();
+    toast("⚡ D-Day 계획이 설정됐어요");
   };
+  const cancelBtn = $("ddayCancelPlanBtn");
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      clearDdayPlan();
+      schedulePush();
+      wrap.className = "hidden"; wrap.innerHTML = "";
+      renderDdayWidget();
+      if (!$("catScreen").classList.contains("hidden")) renderDdayModeCard();
+      toast("D-Day 계획을 취소했어요");
+    };
+  }
   $("ddayCloseBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
+
+  updateLevelDesc();
+  updatePreview();
 }
 
 function startDdayStudy() {
