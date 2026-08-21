@@ -192,7 +192,7 @@ async function syncPull() {
 
   const { data, error } = await supabase
     .from("user_learning_data")
-    .select("studied_all, study_dates, wrong_words, preview_seen")
+    .select("studied_all, study_dates, wrong_words, preview_seen, dday_plan")
     .eq("user_id", state.user.id)
     .maybeSingle();
 
@@ -215,6 +215,7 @@ async function syncPush(payload) {
       study_dates: payload.study_dates,
       wrong_words: payload.wrong_words,
       preview_seen: payload.preview_seen,
+      dday_plan: payload.dday_plan || null,
       updated_at: new Date().toISOString(),
     });
 
