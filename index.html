@@ -70,17 +70,17 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .ytIcon i{width:0;height:0;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;border-left:6px solid #fff;margin-left:1.5px;}
 
 /* ---- daily progress ---- */
-.dailyBox{position:relative;z-index:1;margin:0 0 14px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  box-shadow:0 6px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.35);
-  border-radius:16px;padding:12px 14px;}
-.dailyTop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;}
-.dailyLabel{font-size:11.5px;color:var(--muted);font-weight:700;}
-.dailyCount{font-size:12px;color:var(--ink);font-weight:900;}
-.dailyCount small{color:var(--muted);font-weight:600;}
-.dailyTrack{height:7px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
-.dailyFill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:99px;transition:width .4s ease;}
-.dailyDone{color:var(--gold);font-size:11px;margin-top:6px;}
+.quickCircleRow{display:flex;justify-content:space-around;align-items:flex-start;margin-bottom:6px;}
+.quickCircle{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;
+  cursor:pointer;padding:0;font-family:inherit;}
+.qcRing{width:60px;height:60px;border-radius:50%;padding:4px;box-sizing:border-box;
+  background:conic-gradient(var(--gold) var(--pct,0%), rgba(255,255,255,.1) 0);}
+.qcRing.static{background:rgba(255,255,255,.1);}
+.qcInner{width:100%;height:100%;border-radius:50%;background:#14151b;display:flex;align-items:center;
+  justify-content:center;font-size:22px;}
+.qcLabel{font-size:11.5px;font-weight:800;color:var(--ink);}
+.qcSub{font-size:10px;color:var(--muted);}
+.dailyDone{color:var(--gold);font-size:11px;margin:2px 0 10px;text-align:center;}
 
 /* ---- level selector (glass blob card) ---- */
 .levelGrid{display:flex;flex-direction:column;gap:6px;}
@@ -321,7 +321,7 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
   border:1px solid rgba(255,77,94,.3);border-radius:14px;padding:13px 16px;margin-bottom:14px;
   color:var(--ink);font-size:13.5px;font-weight:800;cursor:pointer;}
 .ddayWidgetBtn .dwbRight{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;font-weight:700;}
-.ddayWidgetBtn .dwbLock{font-size:13px;}
+.ddayWidgetBtn .dwbLock{font-size:11.5px;font-weight:800;color:var(--gold);white-space:nowrap;}
 .ddayWidgetBtn:active{transform:scale(.98);}
 
 .ddayModeCard{width:100%;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
@@ -366,10 +366,14 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
   border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0;margin-right:6px;}
 
 /* ---- HSK 시험일정 달력 ---- */
-.examCalBtn{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
-  color:var(--ink);border-radius:12px;padding:11px 16px;margin-bottom:14px;font-size:12.5px;font-weight:700;
-  cursor:pointer;text-align:left;}
-.examCalBtn:active{transform:scale(.98);}
+.quickTileRow{display:flex;gap:10px;margin-bottom:14px;}
+.quickTile{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:16px;
+  padding:16px 8px 14px;cursor:pointer;transition:transform .15s ease;}
+.quickTile:active{transform:scale(.96);}
+.quickTile .qtIcon{font-size:24px;margin-bottom:2px;}
+.quickTile .qtLabel{font-size:13px;font-weight:800;color:var(--ink);}
+.quickTile .qtSub{font-size:10px;color:var(--muted);}
 .examCalHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .examCalNav{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--line);
   color:var(--ink);font-size:16px;cursor:pointer;}
@@ -381,19 +385,46 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .examCalGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:18px;}
 .examCalDow{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700;padding-bottom:4px;}
 .examCalCell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border-radius:10px;font-size:12px;color:var(--ink);position:relative;background:rgba(255,255,255,.03);}
+  border-radius:10px;font-size:12px;color:var(--ink);position:relative;background:rgba(255,255,255,.03);gap:2px;}
 .examCalCell.empty{background:none;}
-.examCalCell.exam{background:rgba(255,77,94,.18);border:1px solid rgba(255,77,94,.4);font-weight:800;}
+.examCalCell.exam{background:rgba(255,77,94,.14);border:1px solid rgba(255,77,94,.4);font-weight:800;}
 .examCalCell.reg{border:1px solid rgba(245,196,83,.4);}
-.examCalCell .dot{width:4px;height:4px;border-radius:50%;margin-top:2px;}
+.calDayNum{line-height:1;}
+.calDots{display:flex;gap:3px;height:5px;}
+.calDot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.calDot.exam{background:var(--accent);box-shadow:0 0 4px rgba(255,77,94,.7);}
+.calDot.reg{background:var(--gold);box-shadow:0 0 4px rgba(245,196,83,.7);}
 .examListTitle{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px;}
 .examList{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
 .examItem{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .examItem .eiDate{font-size:13px;font-weight:800;color:var(--ink);}
+.eiTypeTag{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:2px;}
+.eiTypeTag.ibt{background:rgba(59,130,246,.18);color:#93C5FD;}
+.eiTypeTag.pbt{background:rgba(245,196,83,.18);color:var(--gold);}
 .examItem .eiType{font-size:10px;color:var(--muted);margin-top:1px;}
 .examItem .eiDday{font-size:12px;font-weight:900;color:var(--accent);white-space:nowrap;}
 .examItem .eiReg{font-size:10px;color:var(--gold);margin-top:1px;}
+
+/* ---- 단어 검색 ---- */
+.searchBar{margin-bottom:10px;}
+.searchInput{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;color:var(--ink);font-size:14px;box-sizing:border-box;outline:none;}
+.searchInput:focus{border-color:var(--accent);}
+.searchMeta{font-size:11.5px;color:var(--muted);margin-bottom:10px;}
+.searchResults{display:flex;flex-direction:column;gap:8px;}
+.searchItem{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .15s ease;}
+.searchItem:active{transform:scale(.98);}
+.searchItem .siMain{flex:1;min-width:0;}
+.searchItem .siHz{font-size:16px;font-weight:800;color:var(--ink);}
+.searchItem .siPy{font-size:11px;color:var(--gold);margin-left:6px;}
+.searchItem .siKr{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.searchItem .siLv{font-size:9px;color:var(--muted);background:rgba(255,255,255,.06);border-radius:99px;
+  padding:2px 7px;margin-top:4px;display:inline-block;}
+.searchItem .siStar{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface2);color:var(--muted);font-size:15px;cursor:pointer;}
+.searchItem .siStar.on{border-color:rgba(245,196,83,.5);background:rgba(245,196,83,.15);color:var(--gold);}
 .quizPoolInfo{font-size:11px;color:var(--muted);text-align:right;margin-top:-8px;margin-bottom:12px;}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:22px;position:relative;
@@ -401,6 +432,11 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .stamp{position:absolute;top:14px;right:14px;width:30px;height:30px;border:1.5px solid var(--accent);
   border-radius:6px;color:var(--accent);font-size:12px;display:flex;align-items:center;justify-content:center;
   transform:rotate(-6deg);opacity:.85;}
+.starBtn{position:absolute;top:12px;right:52px;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface2);color:var(--muted);font-size:16px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s ease;}
+.starBtn:active{transform:scale(.9);}
+.starBtn.on{border-color:rgba(245,196,83,.5);background:rgba(245,196,83,.15);color:var(--gold);}
 .posbadge{position:absolute;top:16px;left:16px;font-size:11px;color:var(--muted);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;background:var(--surface2);}
 .hanzi{font-size:clamp(46px,15vw,64px);line-height:1.1;color:var(--ink);text-align:center;
@@ -468,6 +504,12 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 
 /* ---- 비법 자료실 (external product listing) ---- */
 .shopIntro{text-align:left;margin-bottom:6px;}
+.shopSoonBox{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;}
+.shopSoonBox .ssbIcon{font-size:40px;margin-bottom:12px;}
+.shopSoonBox .ssbTitle{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:8px;}
+.shopSoonBox .ssbSub{font-size:12.5px;color:var(--muted);line-height:1.6;}
 .shopGrid{display:flex;flex-direction:column;gap:5px;}
 .shopCard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 0 8px;
   position:relative;overflow:hidden;display:flex;flex-direction:column;}
@@ -484,6 +526,7 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
   border-radius:99px;padding:6px 14px;font-size:11px;font-weight:800;text-decoration:none;white-space:nowrap;
   position:relative;}
 .shopBuyBtn:active{transform:scale(.96);}
+.shopBuyBtn.shopSoon{background:rgba(245,196,83,.14);color:var(--gold);border-color:rgba(245,196,83,.4);cursor:default;}
 .shopBtn{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 32px);margin:0 16px 2px;padding:12px 0;
   border-radius:12px;border:1px solid var(--accent);background:rgba(255,77,94,.12);color:var(--accent);
   font-size:13px;font-weight:700;text-decoration:none;position:relative;}
@@ -634,17 +677,35 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   </div>
 
   <div id="levelScreen">
-    <div class="dailyBox">
-      <div class="dailyTop">
-        <span class="dailyLabel">🔥 오늘의 학습 목표</span>
-        <span class="dailyCount"><b id="dailyNum">0</b><small>/<span id="dailyGoalTxt">20</span>단어</small></span>
-      </div>
-      <div class="dailyTrack"><div class="dailyFill" id="dailyFill" style="width:0%"></div></div>
-      <div class="dailyDone hidden" id="dailyDoneMsg">🎉 오늘 목표 달성! 대단해요</div>
+    <div class="quickCircleRow">
+      <button class="quickCircle" id="dailyGoalBtn">
+        <div class="qcRing" id="dailyRing" style="--pct:0%"><div class="qcInner">🔥</div></div>
+        <span class="qcLabel">오늘목표</span>
+        <span class="qcSub"><b id="dailyNum">0</b>/<span id="dailyGoalTxt">20</span></span>
+      </button>
+      <button class="quickCircle" id="examCalBtn">
+        <div class="qcRing static"><div class="qcInner">📅</div></div>
+        <span class="qcLabel">시험일정</span>
+        <span class="qcSub">2026년</span>
+      </button>
+      <button class="quickCircle" id="wordSearchBtn">
+        <div class="qcRing static"><div class="qcInner">🔍</div></div>
+        <span class="qcLabel">단어검색</span>
+        <span class="qcSub">한자·병음</span>
+      </button>
     </div>
+    <div class="dailyDone hidden" id="dailyDoneMsg">🎉 오늘 목표 달성! 대단해요</div>
     <button class="ddayWidgetBtn" id="ddayWidgetBtn"></button>
-    <button class="examCalBtn" id="examCalBtn">📅 2026년 HSK 시험일정 보기</button>
     <div class="levelGrid" id="levelGrid"></div>
+  </div>
+
+  <div id="searchScreen" class="hidden">
+    <div class="crumb"><button class="backbtn" id="searchBack">뒤로가기</button></div>
+    <div class="searchBar">
+      <input type="text" id="searchInput" class="searchInput" placeholder="한자, 병음, 뜻으로 검색 (예: 사랑, ai, 爱)" autocomplete="off">
+    </div>
+    <div class="searchMeta" id="searchMeta"></div>
+    <div class="searchResults" id="searchResults"></div>
   </div>
 
   <div id="examCalScreen" class="hidden">
@@ -659,7 +720,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       <span><i class="dotReg"></i> 접수 마감</span>
     </div>
     <div class="examCalGrid" id="examCalGrid"></div>
-    <div class="examListTitle">다가오는 시험 일정</div>
+    <div class="examListTitle">다가오는 시험 일정 <span style="font-weight:500;color:var(--muted);font-size:11px;">(IBT: 인터넷시험 · PBT: 지필시험)</span></div>
     <div class="examList" id="examList"></div>
     <p class="hintline">출처: HSK 한국사무국(hsk.or.kr) 공식 2026년도 일정 기준 · 실제 접수·시험은 공식 사이트에서 확인해 주세요</p>
   </div>
@@ -730,6 +791,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       <span class="wneRight"><span class="wneBadge" id="wrongNoteBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
     </button>
 
+    <button class="statNoteEntry" id="starNoteEntryBtn">
+      <span class="wneLeft">⭐ 학습노트</span>
+      <span class="wneRight"><span class="wneBadge" id="starNoteBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+    </button>
+
     <button class="statNoteEntry" id="reviewStudiedBtn">
       <span class="wneLeft">🔁 학습한 단어 복습</span>
       <span class="wneRight"><span class="wneBadge" id="studiedBadge">0</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
@@ -761,6 +827,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     </div>
     <div class="card">
       <span class="posbadge" id="posBadge"></span>
+      <button class="starBtn" id="starToggleBtn" title="학습노트에 저장">☆</button>
       <span class="stamp kaiti">通</span>
       <div class="hanzi hanziStd" id="hanzi"></div>
       <div class="oneline"><span class="py" id="pinyin"></span><span class="sep">|</span><span class="kr" id="korean"></span></div>
@@ -843,6 +910,12 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     <div class="crumb"><button class="backbtn" id="wrongBack">뒤로가기</button><span class="catlabel">📕 오답노트</span></div>
     <div class="nav" style="margin-top:0;margin-bottom:16px;"><button id="wrongReviewBtn" class="primary">🔁 오답 복습 시작</button></div>
     <div class="wrongList" id="wrongList"></div>
+  </div>
+
+  <div id="starScreen" class="hidden">
+    <div class="crumb"><button class="backbtn" id="starBack">뒤로가기</button><span class="catlabel">⭐ 학습노트</span></div>
+    <div class="nav" style="margin-top:0;margin-bottom:16px;"><button id="starReviewBtn" class="primary">🔁 학습노트 복습 시작</button></div>
+    <div class="wrongList" id="starList"></div>
   </div>
 
   <div id="shopScreen" class="hidden">
@@ -11915,6 +11988,137 @@ function renderWrongScreen() {
   });
 }
 
+/* ---------------- ⭐ 학습노트 (즐겨찾기) ---------------- */
+const STAR_KEY = "hsk_starred_words";
+function getStarredWords() {
+  try { return JSON.parse(localStorage.getItem(STAR_KEY) || "[]"); } catch (e) { return []; }
+}
+function saveStarredWords(arr) { localStorage.setItem(STAR_KEY, JSON.stringify(arr)); }
+function isStarred(id) { return getStarredWords().includes(id); }
+function addStarredWord(id) {
+  const arr = getStarredWords();
+  if (!arr.includes(id)) { arr.push(id); saveStarredWords(arr); }
+  updateStarBadge();
+  schedulePush();
+}
+function removeStarredWord(id) {
+  saveStarredWords(getStarredWords().filter((x) => x !== id));
+  updateStarBadge();
+  schedulePush();
+}
+function toggleStarredWord(id) {
+  if (isStarred(id)) removeStarredWord(id); else addStarredWord(id);
+}
+function updateStarBadge() {
+  const el = $("starNoteBadge");
+  if (!el) return;
+  el.textContent = getStarredWords().length;
+}
+function renderStarScreen() {
+  const ids = getStarredWords();
+  const list = $("starList");
+  $("starReviewBtn").disabled = ids.length === 0;
+  if (!ids.length) {
+    list.innerHTML = `<div class="wrongEmpty">⭐ 학습노트가 비어있어요!<br>단어 옆 별표(☆)를 눌러 저장해보세요.</div>`;
+    return;
+  }
+  list.innerHTML = ids.map((id) => {
+    const entry = ALL_WORDS_BY_ID[id];
+    if (!entry) return "";
+    const w = entry.word;
+    const lv = LEVELS.find((l) => l.id === entry.levelId);
+    return `<div class="wrongItem">
+      <div class="wiMain">
+        <span class="wiHz">${w[1]}</span><span class="wiPy">${w[2]}</span>
+        <div class="wiKr">${w[3]}</div>
+        <span class="wiLv">${lv ? lv.label : ""}</span>
+      </div>
+      <button class="wiBtn" data-id="${id}" title="학습노트에서 빼기">✕</button>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#starList .wiBtn").forEach((b) => {
+    b.onclick = () => { removeStarredWord(Number(b.dataset.id)); renderStarScreen(); };
+  });
+}
+
+/* ---------------- 🔍 단어 검색 ---------------- */
+function normalizePinyin(s) {
+  return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+function renderSearchResults(query) {
+  const q = query.trim().toLowerCase();
+  const qNorm = normalizePinyin(query);
+  const meta = $("searchMeta");
+  const box = $("searchResults");
+  if (!q) { meta.textContent = ""; box.innerHTML = ""; return; }
+  const results = [];
+  for (const idStr in ALL_WORDS_BY_ID) {
+    const entry = ALL_WORDS_BY_ID[idStr];
+    const w = entry.word;
+    if (w[1].includes(q) || normalizePinyin(w[2]).includes(qNorm) || w[3].toLowerCase().includes(q)) {
+      results.push(entry);
+      if (results.length >= 60) break;
+    }
+  }
+  meta.textContent = `${results.length}개 검색됨${results.length >= 60 ? " (상위 60개만 표시)" : ""}`;
+  if (!results.length) { box.innerHTML = `<div class="wrongEmpty">검색 결과가 없어요</div>`; return; }
+  box.innerHTML = results.map((entry) => {
+    const w = entry.word;
+    const lv = LEVELS.find((l) => l.id === entry.levelId);
+    const starred = isStarred(w[0]);
+    return `<div class="searchItem" data-id="${w[0]}">
+      <div class="siMain">
+        <span class="siHz">${w[1]}</span><span class="siPy">${w[2]}</span>
+        <div class="siKr">${w[3]}</div>
+        <span class="siLv">${lv ? lv.label : ""}</span>
+      </div>
+      <button class="siStar${starred ? " on" : ""}" data-id="${w[0]}">${starred ? "★" : "☆"}</button>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".searchItem").forEach((el) => {
+    el.onclick = () => openSearchResultInStudy(Number(el.dataset.id));
+  });
+  document.querySelectorAll(".siStar").forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = Number(b.dataset.id);
+      toggleStarredWord(id);
+      b.classList.toggle("on");
+      b.textContent = isStarred(id) ? "★" : "☆";
+    };
+  });
+}
+let cameFromSearch = false;
+function openSearchResultInStudy(id) {
+  const entry = ALL_WORDS_BY_ID[id];
+  if (!entry) return;
+  const lv = LEVELS.find((l) => l.id === entry.levelId);
+  if (!lv) return;
+  const unlocked = hasAccessToLevel(lv);
+  if (!unlocked && isPreviewExhausted(lv.id) && !getPreviewSeen(lv.id).includes(id)) {
+    showPurchaseGuide(lv);
+    return;
+  }
+  curLevel = lv.id;
+  byCat = computeByCat(curLevel);
+  quizByCat = computeCumulativeByCat(curLevel);
+  const catName = entry.word[5];
+  const catWords = (byCat[catName] && byCat[catName].length) ? byCat[catName] : [entry.word];
+  deck = catWords;
+  idx = Math.max(0, deck.findIndex((w) => w[0] === id));
+  showStroke = false;
+  inDdaySession = false;
+  cameFromSearch = true;
+  curCat = catName;
+  $("studyCat").textContent = catName;
+  document.querySelectorAll(".orderBtn").forEach((b) => b.classList.remove("on"));
+  $("topNav").classList.add("hidden");
+  $("modeTabs").classList.remove("hidden");
+  mode = "study";
+  $("tabStudy").classList.add("on"); $("tabQuiz").classList.remove("on"); $("tabRecord").classList.remove("on");
+  show("studyScreen");
+  renderStudy();
+}
 const CATS = [
   { name: "전체학습", glyph: "全", desc: "전체 단어 한번에", wide: true },
   { name: "명사", glyph: "名", desc: "사물·사람·장소", color: "#93C5FD" },
@@ -12321,6 +12525,9 @@ async function exportZip() {
 /* ---------------- levels & premium lock ---------------- */
 const CREATOR_MODE = false;
 const LOCK_ENABLED = true;
+// 9월 1일 정식 출시 전까지 무료(1급) 외 모든 유료 콘텐츠를 "출시예정"으로 안내
+const PRELAUNCH_MODE = true;
+const LAUNCH_DATE_LABEL = "9월 1일";
 const SMART_STORE_URL = "https://smartstore.naver.com/여기에_스토어주소";
 
 function isSubscribed() {
@@ -12387,7 +12594,7 @@ function renderLevels() {
       </div>
       ${!unlocked
         ? (isPreviewExhausted(lv.id)
-            ? '<div class="lockChip"><div class="lockIcon">🔒</div><span class="lockTxt">이용권 필요</span></div>'
+            ? `<div class="lockChip"><div class="lockIcon">🔒</div><span class="lockTxt">${PRELAUNCH_MODE ? LAUNCH_DATE_LABEL + " 출시" : "이용권 필요"}</span></div>`
             : `<div class="lockChip preview"><div class="lockIcon">👀</div><span class="lockTxt">미리보기 ${previewRemaining(lv.id)}/10</span></div>`)
         : `<div class="actionBtn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>`}
     `;
@@ -12474,11 +12681,13 @@ function renderExamCalendar() {
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const isExam = HSK_EXAM_2026.some((e) => e.date === dateStr);
-    const isRegEnd = HSK_EXAM_2026.some((e) => e.regEnd === dateStr);
+    const examMatches = HSK_EXAM_2026.filter((e) => e.date === dateStr);
+    const regMatches = HSK_EXAM_2026.filter((e) => e.regEnd === dateStr);
     const el = document.createElement("div");
-    el.className = "examCalCell" + (isExam ? " exam" : "") + (isRegEnd && !isExam ? " reg" : "");
-    el.textContent = d;
+    el.className = "examCalCell" + (examMatches.length ? " exam" : "") + (regMatches.length && !examMatches.length ? " reg" : "");
+    const dots = examMatches.map(() => '<span class="calDot exam"></span>').join("")
+      + regMatches.map(() => '<span class="calDot reg"></span>').join("");
+    el.innerHTML = `<span class="calDayNum">${d}</span>${dots ? `<span class="calDots">${dots}</span>` : ""}`;
     grid.appendChild(el);
   }
   renderExamList();
@@ -12486,9 +12695,9 @@ function renderExamCalendar() {
 function renderExamList() {
   const today = todayStr();
   const upcoming = HSK_EXAM_2026
-    .filter((e) => e.type === "IBT" && e.date >= today)
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 6);
+    .filter((e) => e.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type))
+    .slice(0, 8);
   const list = $("examList");
   if (!upcoming.length) { list.innerHTML = `<div class="hintline">2026년 예정된 시험 일정이 모두 지났어요.</div>`; return; }
   list.innerHTML = upcoming.map((e) => {
@@ -12497,7 +12706,7 @@ function renderExamList() {
     const regOpen = today >= e.regStart && today <= e.regEnd;
     return `<div class="examItem">
       <div>
-        <div class="eiDate">${e.date.slice(5).replace("-", "/")} (${DOW_KR[d.getDay()]}) HSK ${e.type}</div>
+        <div class="eiDate">${e.date.slice(5).replace("-", "/")} (${DOW_KR[d.getDay()]}) HSK <span class="eiTypeTag ${e.type.toLowerCase()}">${e.type}</span></div>
         <div class="eiType">접수 ${e.regStart.slice(5)} ~ ${e.regEnd.slice(5)}</div>
       </div>
       <div style="text-align:right;">
@@ -12602,11 +12811,11 @@ function renderDdayWidget() {
     const daily = ddayDailyTarget(plan);
     btn.innerHTML = `<span>⚡ D-${daysLeft} · ${lv ? lv.label : ""} 벼락치기 진행 중</span>
       <span class="dwbRight">
-        ${unlocked ? `<button class="dwbEdit" id="dwbEditBtn" title="급수·기간 변경">⚙️</button><button class="dwbReshuffle" id="dwbReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button> 오늘 ${daily}단어 →` : '<span class="dwbLock">🔒</span>'}
+        ${unlocked ? `<button class="dwbEdit" id="dwbEditBtn" title="급수·기간 변경">⚙️</button><button class="dwbReshuffle" id="dwbReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button> 오늘 ${daily}단어 →` : `<span class="dwbLock">${PRELAUNCH_MODE ? "🚀 " + LAUNCH_DATE_LABEL + " 출시" : "🔒"}</span>`}
       </span>`;
   } else {
     btn.innerHTML = `<span>⚡ D-Day 벼락치기 설정</span>
-      <span class="dwbRight">${unlocked ? "" : '<span class="dwbLock">🔒</span>'}</span>`;
+      <span class="dwbRight">${unlocked ? "" : `<span class="dwbLock">${PRELAUNCH_MODE ? "🚀 " + LAUNCH_DATE_LABEL + " 출시" : "🔒"}</span>`}</span>`;
   }
   btn.onclick = () => {
     if (!unlocked) { showDdayLockedPopup(); return; }
@@ -12641,12 +12850,12 @@ function renderDdayModeCard() {
     card.innerHTML = `<span class="dmcGlyph">⚡</span>
       <div class="dmcInfo"><div class="dmcTitle">D-${daysLeft} 벼락치기 모드 (Day ${dayNum})</div>
       <div class="dmcSub">오늘 ${daily}단어 무작위 학습</div></div>
-      ${unlocked ? '<button class="dmcEdit" id="dmcEditBtn" title="급수·기간 변경">⚙️</button><button class="dmcReshuffle" id="dmcReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button>' : '<span class="dmcLock">🔒</span>'}`;
+      ${unlocked ? '<button class="dmcEdit" id="dmcEditBtn" title="급수·기간 변경">⚙️</button><button class="dmcReshuffle" id="dmcReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button>' : `<span class="dmcLock">${PRELAUNCH_MODE ? "🚀" : "🔒"}</span>`}`;
   } else {
     card.innerHTML = `<span class="dmcGlyph">🔥</span>
       <div class="dmcInfo"><div class="dmcTitle">D-Day 벼락치기 모드 (랜덤 셔플)</div>
-      <div class="dmcSub">시험일에 맞춰 매일 무작위로 학습해요</div></div>
-      ${unlocked ? "" : '<span class="dmcLock">🔒</span>'}`;
+      <div class="dmcSub">${PRELAUNCH_MODE ? LAUNCH_DATE_LABEL + " 출시 예정" : "시험일에 맞춰 매일 무작위로 학습해요"}</div></div>
+      ${unlocked ? "" : `<span class="dmcLock">${PRELAUNCH_MODE ? "🚀" : "🔒"}</span>`}`;
   }
   card.onclick = () => {
     if (!unlocked) { showDdayLockedPopup(); return; }
@@ -12670,6 +12879,18 @@ function renderDdayModeCard() {
 function showDdayLockedPopup() {
   const wrap = $("popupWrap");
   wrap.className = "overlay";
+  if (PRELAUNCH_MODE) {
+    wrap.innerHTML = `<div class="pop premPop">
+      <div class="bigemoji">🚀</div>
+      <h2>${LAUNCH_DATE_LABEL} 정식 출시 예정</h2>
+      <p class="premLine">D-Day 맞춤 벼락치기 플래너는 ${LAUNCH_DATE_LABEL}에 열려요.<br>지금은 1급을 무료로 마음껏 학습해보세요!</p>
+      <div class="btns">
+        <button class="closeBtn" id="ddayLockCloseBtn">닫기</button>
+      </div>
+    </div>`;
+    $("ddayLockCloseBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
+    return;
+  }
   wrap.innerHTML = `<div class="pop premPop">
     <div class="crown">🔒</div>
     <h2>시험이 얼마 남지 않으셨나요?</h2>
@@ -12799,6 +13020,7 @@ function startDdayStudy() {
   (WORDS_BY_LEVEL[plan.levelId] || []).forEach((w) => { wordsMap[w[0]] = w; });
   deck = ids.map((id) => wordsMap[id]).filter(Boolean);
   idx = 0; showStroke = false;
+  cameFromSearch = false;
   curCat = "D-Day 벼락치기";
   inDdaySession = true;
   $("studyCat").textContent = "⚡ D-Day 벼락치기";
@@ -12846,6 +13068,26 @@ let selectedPlan = "1y_early";
 function showPurchaseGuide(lv) {
   const wrap = $("popupWrap");
   wrap.className = "overlay";
+
+  if (PRELAUNCH_MODE) {
+    wrap.innerHTML = `<div class="pop premPop">
+      <div class="bigemoji">🚀</div>
+      <h2>${LAUNCH_DATE_LABEL} 정식 출시 예정</h2>
+      <p class="premLine">${lv ? lv.label + "을 포함한 " : ""}전체 급수는 ${LAUNCH_DATE_LABEL}에 열려요.<br>지금은 1급을 무료로 마음껏 학습해보세요!</p>
+      <div class="btns">
+        <button class="subBtn" id="prelaunchGoFreeBtn">1급 무료로 학습하기 →</button>
+        <button class="closeBtn" id="prelaunchCloseBtn">닫기</button>
+      </div>
+    </div>`;
+    $("prelaunchGoFreeBtn").onclick = () => {
+      wrap.className = "hidden"; wrap.innerHTML = "";
+      const lv1 = LEVELS.find((l) => !l.locked) || LEVELS[0];
+      tryEnterLevel(lv1);
+    };
+    $("prelaunchCloseBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
+    return;
+  }
+
   const loggedIn = isLoggedIn();
 
   wrap.innerHTML = `<div class="pop pricePop">
@@ -12927,12 +13169,17 @@ $("navHomeBtn").onclick = () => setTopNav("home");
 $("navStudyBtn").onclick = () => setTopNav("study");
 $("navMyBtn").onclick = () => setTopNav("mypage");
 $("navShopBtn").onclick = () => setTopNav("shop");
-$("buyLinkBtn").onclick = () => window.open(SMART_STORE_URL, "_blank", "noopener,noreferrer");
+$("buyLinkBtn").onclick = () => {
+  if (PRELAUNCH_MODE) { showPurchaseGuide(null); return; }
+  window.open(SMART_STORE_URL, "_blank", "noopener,noreferrer");
+};
 
 /* ---------------- subscription status strip ---------------- */
 function renderSubStatus() {
   const box = $("subStatusBox");
   if (!box) return;
+  const buyBtn = $("buyLinkBtn");
+  if (buyBtn && PRELAUNCH_MODE) { buyBtn.textContent = `🚀 ${LAUNCH_DATE_LABEL} 이용권 오픈 예정`; }
 
   if (!LOCK_ENABLED) {
     box.className = "subStatusBox soon";
@@ -13019,10 +13266,15 @@ $("authTabLogin").onclick = () => {
   setAuthMsg("", "");
 };
 $("authTabSignup").onclick = () => {
+  if (PRELAUNCH_MODE) {
+    setAuthMsg(`🚀 회원가입은 ${LAUNCH_DATE_LABEL}부터 가능해요. 그때 다시 찾아와 주세요!`, "");
+    return;
+  }
   $("authTabSignup").classList.add("on"); $("authTabLogin").classList.remove("on");
   $("authFormSignup").classList.remove("hidden"); $("authFormLogin").classList.add("hidden");
   setAuthMsg("", "");
 };
+if (PRELAUNCH_MODE) { $("authTabSignup").textContent = "🔒 회원가입"; }
 
 function bindAuthUI() {
   if (!window.HSKAuth) return;
@@ -13036,6 +13288,7 @@ function bindAuthUI() {
   };
 
   $("emailSignupBtn").onclick = async () => {
+    if (PRELAUNCH_MODE) { setAuthMsg(`🚀 회원가입은 ${LAUNCH_DATE_LABEL}부터 가능해요.`, "bad"); return; }
     const email = $("signupEmail").value.trim();
     const pw = $("signupPassword").value;
     const pw2 = $("signupPassword2").value;
@@ -13082,7 +13335,20 @@ function bindAuthUI() {
 })();
 
 /* ---------------- daily study progress (localStorage; resets each day) ---------------- */
-const DAILY_GOAL = 20;
+const DAILY_GOAL_KEY = "hsk_daily_goal";
+const DEFAULT_DAILY_GOAL = 20;
+function getDailyGoalRaw() {
+  const v = Number(localStorage.getItem(DAILY_GOAL_KEY));
+  return v > 0 ? v : null;
+}
+function getDailyGoal() {
+  return getDailyGoalRaw() || DEFAULT_DAILY_GOAL;
+}
+function setDailyGoal(n) {
+  localStorage.setItem(DAILY_GOAL_KEY, String(n));
+  updateDailyUI();
+  schedulePush();
+}
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function todayKey() { return "hsktime-daily-" + todayStr(); }
 function loadDaily() {
@@ -13090,6 +13356,11 @@ function loadDaily() {
 }
 function saveDaily(arr) {
   try { localStorage.setItem(todayKey(), JSON.stringify(arr)); } catch (e) {}
+}
+function getDailyProgress() { return { date: todayStr(), ids: loadDaily() }; }
+function mergeDailyProgress(local, cloud) {
+  if (!cloud || cloud.date !== local.date) return local; // 클라우드가 오늘 기록이 아니면(어제까지 것이면) 무시하고 로컬 그대로
+  return { date: local.date, ids: mergeArr(local.ids, cloud.ids) };
 }
 
 /* ---------------- 학습 통계: 전체 학습단어 + 연속학습일 ---------------- */
@@ -13146,8 +13417,11 @@ function collectLocalLearningData() {
     studied_all: getStudiedAll(),
     study_dates: getStudyDates(),
     wrong_words: getWrongList(),
+    starred_words: getStarredWords(),
     preview_seen,
     dday_plan: getDdayPlan(),
+    daily_goal: getDailyGoalRaw(),
+    daily_progress: getDailyProgress(),
   };
 }
 function mergeArr(a, b) { return Array.from(new Set([...(a || []), ...(b || [])])); }
@@ -13180,8 +13454,11 @@ async function syncLearningData() {
       studied_all: mergeArr(local.studied_all, cloud && cloud.studied_all),
       study_dates: mergeArr(local.study_dates, cloud && cloud.study_dates),
       wrong_words: mergeArr(local.wrong_words, cloud && cloud.wrong_words),
+      starred_words: mergeArr(local.starred_words, cloud && cloud.starred_words),
       preview_seen: {},
       dday_plan: mergeDdayPlan(local.dday_plan, cloud && cloud.dday_plan),
+      daily_goal: local.daily_goal || (cloud && cloud.daily_goal) || null,
+      daily_progress: mergeDailyProgress(local.daily_progress, cloud && cloud.daily_progress),
     };
     LEVELS.forEach((lv) => {
       merged.preview_seen[lv.id] = mergeArr(local.preview_seen[lv.id], cloud && cloud.preview_seen && cloud.preview_seen[lv.id]);
@@ -13190,13 +13467,17 @@ async function syncLearningData() {
     localStorage.setItem(STUDIED_ALL_KEY, JSON.stringify(merged.studied_all));
     localStorage.setItem(STUDY_DATES_KEY, JSON.stringify(merged.study_dates));
     saveWrongList(merged.wrong_words);
+    saveStarredWords(merged.starred_words);
     LEVELS.forEach((lv) => localStorage.setItem(previewKey(lv.id), JSON.stringify(merged.preview_seen[lv.id] || [])));
     if (merged.dday_plan) saveDdayPlan(merged.dday_plan); else clearDdayPlan();
+    if (merged.daily_goal) localStorage.setItem(DAILY_GOAL_KEY, String(merged.daily_goal));
+    saveDaily(merged.daily_progress.ids);
 
     await window.HSKAuth.syncPush(merged);
 
     updateDailyUI();
     updateWrongBadge();
+    updateStarBadge();
     if (!$("studyStatsScreen").classList.contains("hidden")) renderStudyStats();
     if (!$("levelScreen").classList.contains("hidden")) { renderLevels(); renderDdayWidget(); }
     if (!$("catScreen").classList.contains("hidden")) renderDdayModeCard();
@@ -13215,12 +13496,53 @@ function schedulePush() {
   }, 1500);
 }
 function updateDailyUI() {
-  const n = Math.min(loadDaily().length, DAILY_GOAL);
+  const goal = getDailyGoal();
+  const n = Math.min(loadDaily().length, goal);
   $("dailyNum").textContent = loadDaily().length;
-  $("dailyGoalTxt").textContent = DAILY_GOAL;
-  $("dailyFill").style.width = (n / DAILY_GOAL * 100) + "%";
-  $("dailyDoneMsg").classList.toggle("hidden", loadDaily().length < DAILY_GOAL);
+  $("dailyGoalTxt").textContent = goal;
+  $("dailyRing").style.setProperty("--pct", (n / goal * 100) + "%");
+  $("dailyDoneMsg").classList.toggle("hidden", loadDaily().length < goal);
 }
+function showDailyGoalPopup() {
+  const wrap = $("popupWrap");
+  wrap.className = "overlay";
+  const current = getDailyGoal();
+  const presets = [10, 20, 30, 50];
+  wrap.innerHTML = `<div class="pop ddaySetupCard">
+    <div class="bigemoji">🔥</div>
+    <h2>오늘의 학습 목표</h2>
+    <p class="premLine">하루에 몇 단어씩 학습할지 정해보세요.</p>
+    <div class="ddayPeriodRow">
+      ${presets.map((p) => `<button class="ddayPeriodBtn${p === current ? " on" : ""}" data-goal="${p}">${p}개</button>`).join("")}
+    </div>
+    <input type="number" class="ddayCustomInput" id="dailyGoalCustom" placeholder="직접 입력 (단어 수)" min="1" max="500" value="${presets.includes(current) ? "" : current}">
+    <div class="btns">
+      <button class="subBtn" id="dailyGoalConfirmBtn">설정 완료</button>
+      <button class="closeBtn" id="dailyGoalCloseBtn">닫기</button>
+    </div>
+  </div>`;
+  let selected = current;
+  document.querySelectorAll(".ddayPeriodBtn").forEach((b) => {
+    b.onclick = () => {
+      selected = Number(b.dataset.goal);
+      document.querySelectorAll(".ddayPeriodBtn").forEach((x) => x.classList.remove("on"));
+      b.classList.add("on");
+      $("dailyGoalCustom").value = "";
+    };
+  });
+  $("dailyGoalCustom").oninput = () => {
+    const v = Number($("dailyGoalCustom").value);
+    if (v > 0) { selected = v; document.querySelectorAll(".ddayPeriodBtn").forEach((x) => x.classList.remove("on")); }
+  };
+  $("dailyGoalConfirmBtn").onclick = () => {
+    if (!selected || selected < 1) return;
+    setDailyGoal(selected);
+    wrap.className = "hidden"; wrap.innerHTML = "";
+    toast("🔥 오늘의 목표를 " + selected + "개로 설정했어요");
+  };
+  $("dailyGoalCloseBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
+}
+$("dailyGoalBtn").onclick = () => showDailyGoalPopup();
 
 function renderStudyStats() {
   const streak = computeStreak();
@@ -13237,9 +13559,16 @@ function renderStudyStats() {
 
   $("wrongNoteBadge").textContent = wrongN;
   $("studiedBadge").textContent = studiedN;
+  updateStarBadge();
 }
 $("wrongNoteEntryBtn").onclick = () => { show("wrongScreen"); renderWrongScreen(); };
 $("reviewStudiedBtn").onclick = () => { if (getStudiedAll().length) startFullReviewQuiz(); };
+$("wordSearchBtn").onclick = () => { show("searchScreen"); $("searchInput").value = ""; $("searchResults").innerHTML = ""; $("searchMeta").textContent = ""; setTimeout(() => $("searchInput").focus(), 100); };
+$("searchBack").onclick = () => { show("levelScreen"); renderLevels(); };
+$("searchInput").oninput = () => renderSearchResults($("searchInput").value);
+$("starNoteEntryBtn").onclick = () => { show("starScreen"); renderStarScreen(); };
+$("starBack").onclick = () => { show("studyStatsScreen"); renderStudyStats(); };
+$("starReviewBtn").onclick = () => { if (getStarredWords().length) startReviewQuizFromIds(getStarredWords(), "⭐ 학습노트 복습"); };
 
 /* ---------------- state ---------------- */
 let mode = "study", curCat = null;
@@ -13248,7 +13577,7 @@ let quizQs = [], qIdx = 0, score = 0, wrongCount = 0, answered = false, qNextTim
 function advanceQuiz() { renderQuiz(); }
 
 function show(id) {
-  ["levelScreen", "myPageScreen", "studyStatsScreen", "catScreen", "studyScreen", "quizScreen", "recordScreen", "shopScreen", "wrongScreen", "examCalScreen"].forEach((s) => $(s).classList.add("hidden"));
+  ["levelScreen", "myPageScreen", "studyStatsScreen", "catScreen", "studyScreen", "quizScreen", "recordScreen", "shopScreen", "wrongScreen", "examCalScreen", "searchScreen", "starScreen"].forEach((s) => $(s).classList.add("hidden"));
   $(id).classList.remove("hidden");
   $("mainBanner").classList.toggle("hidden", id === "studyScreen" || id === "quizScreen" || id === "recordScreen");
 }
@@ -13295,6 +13624,17 @@ const PRODUCTS = [
 ];
 function renderShop() {
   const g = $("shopGrid"); g.innerHTML = "";
+  const intro = document.querySelector(".shopIntro");
+  if (PRELAUNCH_MODE) {
+    if (intro) intro.classList.add("hidden");
+    g.innerHTML = `<div class="shopSoonBox">
+      <div class="ssbIcon">🚀</div>
+      <div class="ssbTitle">${LAUNCH_DATE_LABEL} 자료실 오픈 예정</div>
+      <div class="ssbSub">급수별 PDF 워크북을 준비하고 있어요.<br>정식 출시일에 다시 찾아와 주세요!</div>
+    </div>`;
+    return;
+  }
+  if (intro) intro.classList.remove("hidden");
   PRODUCTS.forEach((p) => {
     const el = document.createElement("div");
     el.className = "shopCard";
@@ -13327,6 +13667,7 @@ $("tabRecord").onclick = () => setTab("record");
 function startStudy(cat) {
   curCat = cat; deck = [...byCat[cat]]; idx = 0; showStroke = false;
   inDdaySession = false;
+  cameFromSearch = false;
   $("studyCat").textContent = cat;
   document.querySelectorAll(".orderBtn").forEach((b) => b.classList.remove("on"));
   show("studyScreen"); renderStudy();
@@ -13377,6 +13718,16 @@ function renderStudy() {
   $("pinyin").textContent = w[2];
   $("korean").textContent = w[3];
   $("posBadge").textContent = w[4];
+  const starBtn = $("starToggleBtn");
+  const starred = isStarred(w[0]);
+  starBtn.classList.toggle("on", starred);
+  starBtn.textContent = starred ? "★" : "☆";
+  starBtn.onclick = () => {
+    toggleStarredWord(w[0]);
+    const nowStarred = isStarred(w[0]);
+    starBtn.classList.toggle("on", nowStarred);
+    starBtn.textContent = nowStarred ? "★" : "☆";
+  };
 
   // 대화문(B:) 줄바꿈 처리 함수
   const formatDialog = (text) => text ? text.replace(/\s?B:/g, "<br>B:") : "";
@@ -13445,7 +13796,11 @@ $("pinyinOrderBtn").onclick = () => {
   $("pinyinOrderBtn").classList.add("on");
   renderStudy();
 };
-$("studyBack").onclick = () => { inDdaySession = false; show("catScreen"); renderCats(); };
+$("studyBack").onclick = () => {
+  inDdaySession = false;
+  if (cameFromSearch) { cameFromSearch = false; $("topNav").classList.remove("hidden"); show("searchScreen"); }
+  else { show("catScreen"); renderCats(); }
+};
 $("quizBack").onclick = () => show("catScreen");
 $("quizNextBtn").onclick = () => { clearTimeout(qNextTimer); advanceQuiz(); };
 
