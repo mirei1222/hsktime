@@ -12226,6 +12226,7 @@ function quizCountFor(levelId, catName) {
 }
 
 const $ = (id) => document.getElementById(id);
+let _syncing = false;
 const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 /* ---------------- audio engine (Supabase Storage 전용) ---------------- */
@@ -12584,8 +12585,9 @@ async function exportZip() {
 /* ---------------- levels & premium lock ---------------- */
 const CREATOR_MODE = false;
 const LOCK_ENABLED = true;
-// 9월 1일 정식 출시 전까지 무료(1급) 외 모든 유료 콘텐츠를 "출시예정"으로 안내
-const PRELAUNCH_MODE = true;
+// 앱 이용권/D-Day/회원가입은 이제 정식 오픈! 자료실(PDF 워크북)만 상품 준비중이라 따로 잠가둠
+const PRELAUNCH_MODE = false;
+const SHOP_PRELAUNCH = true;
 const LAUNCH_DATE_LABEL = "9월 1일";
 // 배포/업데이트할 때마다 이 날짜만 바꿔주면 앱 하단에 자동으로 반영돼요
 const APP_UPDATE_DATE = "2026-08-30";
@@ -13168,7 +13170,6 @@ function showPurchaseGuide(lv) {
       <li>단어·예문 무제한 학습</li>
       <li>랜덤 퀴즈 무제한 도전</li>
       <li>예문 발음(TTS) 및 획순 애니메이션</li>
-      <li>급수별 PDF 워크북 할인 구매</li>
     </ul>
   </div>`;
 
@@ -13492,7 +13493,6 @@ function mergeDdayPlan(local, cloud) {
   return (local.startDate >= cloud.startDate) ? local : cloud;
 }
 
-let _syncing = false;
 async function syncLearningData() {
   if (_syncing) return;
   if (!isLoggedIn() || !window.HSKAuth || !window.HSKAuth.syncPull) return;
@@ -13675,12 +13675,12 @@ const PRODUCTS = [
 function renderShop() {
   const g = $("shopGrid"); g.innerHTML = "";
   const intro = document.querySelector(".shopIntro");
-  if (PRELAUNCH_MODE) {
+  if (SHOP_PRELAUNCH) {
     if (intro) intro.classList.add("hidden");
     g.innerHTML = `<div class="shopSoonBox">
-      <div class="ssbIcon">🚀</div>
-      <div class="ssbTitle">${LAUNCH_DATE_LABEL} 자료실 오픈 예정</div>
-      <div class="ssbSub">급수별 PDF 워크북을 준비하고 있어요.<br>정식 출시일에 다시 찾아와 주세요!</div>
+      <div class="ssbIcon">🛠️</div>
+      <div class="ssbTitle">상품 준비중입니다</div>
+      <div class="ssbSub">급수별 PDF 워크북을 준비하고 있어요.<br>조금만 기다려 주세요!</div>
     </div>`;
     return;
   }
