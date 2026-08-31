@@ -21,6 +21,45 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .hanziStd{font-family:'Noto Sans SC',sans-serif !important;font-weight:700;}
 #app{width:100%;max-width:430px;padding:18px 16px 76px;position:relative;}
 
+#splashScreen{position:fixed;inset:0;z-index:9999;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255,90,120,.28), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(245,150,120,.18), transparent 45%),
+    radial-gradient(circle at 80% 85%, rgba(245,196,83,.16), transparent 45%),
+    #0b0c10;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .5s ease,visibility .5s ease;}
+#splashScreen.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.splashDeco{position:absolute;inset:0;pointer-events:none;}
+.splashBlob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.5;}
+.splashBlob.b1{width:160px;height:160px;background:radial-gradient(circle,rgba(255,77,94,.35),transparent 70%);top:8%;left:-10%;}
+.splashBlob.b2{width:200px;height:200px;background:radial-gradient(circle,rgba(245,196,83,.25),transparent 70%);bottom:12%;right:-12%;}
+.splashBlob.b3{width:130px;height:130px;background:radial-gradient(circle,rgba(255,150,120,.2),transparent 70%);bottom:30%;left:6%;}
+.splashSparkle{position:absolute;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.9);
+  animation:splashTwinkle 1.8s ease-in-out infinite;}
+.splashSparkle.s1{top:16%;left:14%;font-size:20px;animation-delay:.2s;}
+.splashSparkle.s2{top:24%;right:16%;font-size:13px;animation-delay:.9s;}
+.splashInner{position:relative;text-align:center;animation:splashFadeIn .5s ease both;padding:0 30px;}
+.splashLogo{position:relative;overflow:hidden;display:inline-block;font-size:38px;font-weight:900;
+  font-style:italic;color:#fff;padding:4px 10px;letter-spacing:.5px;}
+.splashLogo::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.75),transparent);
+  transform:skewX(-20deg);animation:splashSweep 1.3s ease-in-out .15s;}
+.splashAccent{color:var(--accent);}
+.splashSubtitle{font-size:15px;font-weight:800;font-style:italic;margin-top:10px;
+  background:linear-gradient(90deg,var(--accent),var(--gold));-webkit-background-clip:text;
+  background-clip:text;color:transparent;}
+.splashTag{font-size:12.5px;color:#D8D9E0;margin-top:8px;letter-spacing:.2px;font-weight:600;}
+.splashFeatures{display:flex;justify-content:center;gap:26px;margin-top:26px;}
+.splashFeature{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.sfIcon{width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  background:rgba(255,255,255,.06);}
+.sfLabel{font-size:10.5px;color:#C7C9D4;font-weight:600;}
+@keyframes splashFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes splashSweep{0%{left:-60%;}100%{left:130%;}}
+@keyframes splashTwinkle{0%,100%{opacity:.3;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+
 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
 .logo{font-weight:900;font-size:19px;letter-spacing:-.4px;}
 .logo b{color:var(--accent);} .logo span{color:var(--muted);font-weight:700;}
@@ -70,16 +109,16 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .ytIcon i{width:0;height:0;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;border-left:6px solid #fff;margin-left:1.5px;}
 
 /* ---- daily progress ---- */
-.quickCircleRow{display:flex;justify-content:space-around;align-items:flex-start;margin-bottom:6px;}
+.quickCircleRow{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:2px;}
 .quickCircle{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;
-  cursor:pointer;padding:0;font-family:inherit;}
-.qcRing{width:60px;height:60px;border-radius:50%;padding:4px;box-sizing:border-box;
+  cursor:pointer;padding:0;font-family:inherit;flex:1;min-width:0;}
+.qcRing{width:52px;height:52px;border-radius:50%;padding:3.5px;box-sizing:border-box;
   background:conic-gradient(var(--gold) var(--pct,0%), rgba(255,255,255,.1) 0);}
 .qcRing.static{background:rgba(255,255,255,.1);}
 .qcInner{width:100%;height:100%;border-radius:50%;background:#14151b;display:flex;align-items:center;
-  justify-content:center;font-size:22px;}
-.qcLabel{font-size:11.5px;font-weight:800;color:var(--ink);}
-.qcSub{font-size:10px;color:var(--muted);}
+  justify-content:center;font-size:19px;}
+.qcLabel{font-size:10.5px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.qcSub{font-size:9px;color:var(--muted);white-space:nowrap;}
 .dailyDone{color:var(--gold);font-size:11px;margin:2px 0 10px;text-align:center;}
 
 /* ---- level selector (glass blob card) ---- */
@@ -656,6 +695,22 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>
 </head>
 <body>
+<div id="splashScreen">
+  <div class="splashDeco">
+    <span class="splashBlob b1"></span><span class="splashBlob b2"></span><span class="splashBlob b3"></span>
+    <span class="splashSparkle s1">✦</span><span class="splashSparkle s2">✦</span>
+  </div>
+  <div class="splashInner">
+    <div class="splashLogo"><b>HSK</b><span class="splashAccent">_time</span></div>
+    <div class="splashSubtitle">HSK 중국어 단어공부 웹앱</div>
+    <div class="splashTag">HSK3.0 1급부터 7~9급까지 11,000개 단어</div>
+    <div class="splashFeatures">
+      <div class="splashFeature"><div class="sfIcon">💬</div><div class="sfLabel">일상대화예문</div></div>
+      <div class="splashFeature"><div class="sfIcon">🔊</div><div class="sfLabel">원어민발음</div></div>
+      <div class="splashFeature"><div class="sfIcon">✍️</div><div class="sfLabel">획순보기</div></div>
+    </div>
+  </div>
+</div>
 <div id="app">
   <div class="banner" id="mainBanner">
     <div class="bannerTop">
@@ -688,6 +743,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
         <span class="qcLabel">시험일정</span>
         <span class="qcSub">2026년</span>
       </button>
+      <button class="quickCircle" id="ddayCircleBtn">
+        <div class="qcRing static" id="ddayCircleRing"><div class="qcInner">⚡</div></div>
+        <span class="qcLabel">D-Day</span>
+        <span class="qcSub" id="ddayCircleSub">설정하기</span>
+      </button>
       <button class="quickCircle" id="wordSearchBtn">
         <div class="qcRing static"><div class="qcInner">🔍</div></div>
         <span class="qcLabel">단어검색</span>
@@ -695,7 +755,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       </button>
     </div>
     <div class="dailyDone hidden" id="dailyDoneMsg">🎉 오늘 목표 달성! 대단해요</div>
-    <button class="ddayWidgetBtn" id="ddayWidgetBtn"></button>
     <div class="levelGrid" id="levelGrid"></div>
   </div>
 
@@ -923,7 +982,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     <div class="shopGrid" id="shopGrid"></div>
   </div>
 
-  <div class="footer">HSK_time<br><a href="guide.html" style="color:#6b6f82;">HSK 가이드</a> · <a href="about.html" style="color:#6b6f82;">소개</a> · <a href="privacy.html" style="color:#6b6f82;">개인정보처리방침</a> · <a href="contact.html" style="color:#6b6f82;">문의</a></div>
+  <div class="footer">HSK_time<br><a href="guide.html" style="color:#6b6f82;">HSK 가이드</a> · <a href="about.html" style="color:#6b6f82;">소개</a> · <a href="privacy.html" style="color:#6b6f82;">개인정보처리방침</a> · <a href="contact.html" style="color:#6b6f82;">문의</a><br><span id="appUpdateDate" style="font-size:10.5px;color:#4d5162;"></span></div>
 </div>
 <div id="popupWrap" class="hidden"></div>
 
@@ -12528,7 +12587,9 @@ const LOCK_ENABLED = true;
 // 9월 1일 정식 출시 전까지 무료(1급) 외 모든 유료 콘텐츠를 "출시예정"으로 안내
 const PRELAUNCH_MODE = true;
 const LAUNCH_DATE_LABEL = "9월 1일";
-const SMART_STORE_URL = "https://smartstore.naver.com/여기에_스토어주소";
+// 배포/업데이트할 때마다 이 날짜만 바꿔주면 앱 하단에 자동으로 반영돼요
+const APP_UPDATE_DATE = "2026-08-30";
+const SMART_STORE_URL = "https://naver.me/5su436Hw";
 
 function isSubscribed() {
   return !!(window.HSKAuth && window.HSKAuth.isSubscribed);
@@ -12615,7 +12676,7 @@ function applyLevelBadge(el, lv) {
 }
 
 /* ================================================================
- * D-Day 벼락치기 플래너
+ * D-Day 학습 플래너
  * ================================================================ */
 function toast(msg) {
   let el = document.getElementById("hskToast");
@@ -12801,38 +12862,29 @@ function ddayMarkDone(wordId) {
 }
 
 function renderDdayWidget() {
-  const btn = $("ddayWidgetBtn");
+  const btn = $("ddayCircleBtn");
   if (!btn) return;
+  const ring = $("ddayCircleRing");
+  const sub = $("ddayCircleSub");
   const plan = getDdayPlan();
   const unlocked = isPremiumUnlocked();
   if (plan) {
-    const lv = LEVELS.find((l) => l.id === plan.levelId);
     const daysLeft = ddayRemainingDays(plan);
-    const daily = ddayDailyTarget(plan);
-    btn.innerHTML = `<span>⚡ D-${daysLeft} · ${lv ? lv.label : ""} 벼락치기 진행 중</span>
-      <span class="dwbRight">
-        ${unlocked ? `<button class="dwbEdit" id="dwbEditBtn" title="급수·기간 변경">⚙️</button><button class="dwbReshuffle" id="dwbReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button> 오늘 ${daily}단어 →` : `<span class="dwbLock">${PRELAUNCH_MODE ? "🚀 " + LAUNCH_DATE_LABEL + " 출시" : "🔒"}</span>`}
-      </span>`;
+    const todayList = (plan.dailyLists && plan.dailyLists[todayStr()]) || [];
+    const doneToday = todayList.filter((id) => (plan.doneIds || []).includes(id)).length;
+    const pct = todayList.length ? Math.round((doneToday / todayList.length) * 100) : 0;
+    ring.classList.remove("static");
+    ring.style.setProperty("--pct", pct + "%");
+    sub.textContent = unlocked ? ("D-" + daysLeft) : (PRELAUNCH_MODE ? "출시예정" : "🔒");
   } else {
-    btn.innerHTML = `<span>⚡ D-Day 벼락치기 설정</span>
-      <span class="dwbRight">${unlocked ? "" : `<span class="dwbLock">${PRELAUNCH_MODE ? "🚀 " + LAUNCH_DATE_LABEL + " 출시" : "🔒"}</span>`}</span>`;
+    ring.classList.add("static");
+    ring.style.removeProperty("--pct");
+    sub.textContent = unlocked ? "설정하기" : (PRELAUNCH_MODE ? "출시예정" : "🔒");
   }
   btn.onclick = () => {
     if (!unlocked) { showDdayLockedPopup(); return; }
     if (plan) { startDdayStudy(); } else { showDdaySetupPopup(); }
   };
-  const editBtn = $("dwbEditBtn");
-  if (editBtn) {
-    editBtn.onclick = (e) => { e.stopPropagation(); showDdaySetupPopup(); };
-  }
-  const reBtn = $("dwbReshuffleBtn");
-  if (reBtn) {
-    reBtn.onclick = (e) => {
-      e.stopPropagation();
-      ddayRegenerateToday();
-      toast("🔄 오늘 학습 목록을 다시 섞었어요");
-    };
-  }
 }
 
 function renderDdayModeCard() {
@@ -12848,12 +12900,12 @@ function renderDdayModeCard() {
     const dayNum = ddayCurrentDayNumber(planForThisLevel);
     const daily = ddayDailyTarget(planForThisLevel);
     card.innerHTML = `<span class="dmcGlyph">⚡</span>
-      <div class="dmcInfo"><div class="dmcTitle">D-${daysLeft} 벼락치기 모드 (Day ${dayNum})</div>
+      <div class="dmcInfo"><div class="dmcTitle">D-${daysLeft} 학습 모드 (Day ${dayNum})</div>
       <div class="dmcSub">오늘 ${daily}단어 무작위 학습</div></div>
       ${unlocked ? '<button class="dmcEdit" id="dmcEditBtn" title="급수·기간 변경">⚙️</button><button class="dmcReshuffle" id="dmcReshuffleBtn" title="오늘 목록 다시 섞기">🔄</button>' : `<span class="dmcLock">${PRELAUNCH_MODE ? "🚀" : "🔒"}</span>`}`;
   } else {
     card.innerHTML = `<span class="dmcGlyph">🔥</span>
-      <div class="dmcInfo"><div class="dmcTitle">D-Day 벼락치기 모드 (랜덤 셔플)</div>
+      <div class="dmcInfo"><div class="dmcTitle">D-Day 학습 모드 (랜덤 셔플)</div>
       <div class="dmcSub">${PRELAUNCH_MODE ? LAUNCH_DATE_LABEL + " 출시 예정" : "시험일에 맞춰 매일 무작위로 학습해요"}</div></div>
       ${unlocked ? "" : `<span class="dmcLock">${PRELAUNCH_MODE ? "🚀" : "🔒"}</span>`}`;
   }
@@ -12883,7 +12935,7 @@ function showDdayLockedPopup() {
     wrap.innerHTML = `<div class="pop premPop">
       <div class="bigemoji">🚀</div>
       <h2>${LAUNCH_DATE_LABEL} 정식 출시 예정</h2>
-      <p class="premLine">D-Day 맞춤 벼락치기 플래너는 ${LAUNCH_DATE_LABEL}에 열려요.<br>지금은 1급을 무료로 마음껏 학습해보세요!</p>
+      <p class="premLine">D-Day 맞춤 학습 플래너는 ${LAUNCH_DATE_LABEL}에 열려요.<br>지금은 1급을 무료로 마음껏 학습해보세요!</p>
       <div class="btns">
         <button class="closeBtn" id="ddayLockCloseBtn">닫기</button>
       </div>
@@ -12894,7 +12946,7 @@ function showDdayLockedPopup() {
   wrap.innerHTML = `<div class="pop premPop">
     <div class="crown">🔒</div>
     <h2>시험이 얼마 남지 않으셨나요?</h2>
-    <p class="premLine">구독하면 D-Day 맞춤 벼락치기 플래너와 무작위 셔플 학습이 열려요.</p>
+    <p class="premLine">구독하면 D-Day 맞춤 학습 플래너와 무작위 셔플 학습이 열려요.</p>
     <div class="btns">
       <button class="subBtn" id="ddayGoBuyBtn">이용권 보러 가기 →</button>
       <button class="closeBtn" id="ddayLockCloseBtn">닫기</button>
@@ -12917,7 +12969,7 @@ function showDdaySetupPopup() {
 
   wrap.innerHTML = `<div class="pop ddaySetupCard">
     <div class="bigemoji">⚡</div>
-    <h2>D-Day 벼락치기 설정</h2>
+    <h2>D-Day 학습 설정</h2>
     <div class="ddayLevelLabel">급수 선택</div>
     <div class="ddayLevelRow" id="ddayLevelRow">
       ${LEVELS.map((l) => `<button class="ddayLevelBtn${l.id === selectedLevelId ? " on" : ""}" data-level="${l.id}" style="${l.id === selectedLevelId ? `background:${l.color};border-color:${l.color}` : `border-color:${l.color}80;background:${l.color}22`}">${l.label}</button>`).join("")}
@@ -13021,9 +13073,9 @@ function startDdayStudy() {
   deck = ids.map((id) => wordsMap[id]).filter(Boolean);
   idx = 0; showStroke = false;
   cameFromSearch = false;
-  curCat = "D-Day 벼락치기";
+  curCat = "D-Day 학습";
   inDdaySession = true;
-  $("studyCat").textContent = "⚡ D-Day 벼락치기";
+  $("studyCat").textContent = "⚡ D-Day 학습";
   document.querySelectorAll(".orderBtn").forEach((b) => b.classList.remove("on"));
   $("topNav").classList.add("hidden");
   $("modeTabs").classList.remove("hidden");
@@ -13058,12 +13110,10 @@ function showComingSoon(lv) {
 }
 const PLANS = [
   { id: "1m", name: "1개월", sub: "가볍게 시작", price: 9900, unit: "30일" },
-  { id: "3m", name: "3개월", sub: "가장 인기", price: 19900, unit: "90일", badge: "인기" },
-  { id: "6m", name: "6개월", sub: "장기 학습에 유리", price: 29900, unit: "180일" },
-  { id: "1y", name: "연간", sub: "가장 저렴, 약 50% 할인", price: 59900, unit: "365일" },
-  { id: "1y_early", name: "연간 얼리버드", sub: "선착 100명 한정 특가", price: 39900, unit: "365일", badge: "얼리버드", hot: true },
+  { id: "3m", name: "3개월", sub: "가장 인기", price: 24900, unit: "90일", badge: "인기" },
+  { id: "12m", name: "12개월", sub: "가장 저렴, 약 50% 할인", price: 59900, unit: "365일", badge: "최대혜택", hot: true },
 ];
-let selectedPlan = "1y_early";
+let selectedPlan = "12m";
 
 function showPurchaseGuide(lv) {
   const wrap = $("popupWrap");
@@ -14093,6 +14143,9 @@ show("levelScreen");
 updateDailyUI();
 updateWrongBadge();
 refreshRecordedSet().catch(() => {});
+setTimeout(() => { const sp = document.getElementById("splashScreen"); if (sp) sp.classList.add("hide"); }, 3200);
+const _updEl = document.getElementById("appUpdateDate");
+if (_updEl) _updEl.textContent = "업데이트: " + APP_UPDATE_DATE;
 </script>
 <script type="module" src="./hsk-auth.js"></script>
 </body>
