@@ -362,6 +362,15 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .ddayWidgetBtn .dwbRight{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;font-weight:700;}
 .ddayWidgetBtn .dwbLock{font-size:11.5px;font-weight:800;color:var(--gold);white-space:nowrap;}
 .ddayWidgetBtn:active{transform:scale(.98);}
+.ddayStartBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(90deg,var(--accent),#C8102E);border:0;border-radius:14px;
+  padding:10px 16px;margin-bottom:14px;color:#fff;font-size:14px;font-weight:900;cursor:pointer;
+  box-shadow:0 0 18px rgba(255,77,94,.3);}
+.ddayStartBtn:active{transform:scale(.98);}
+.ddayStartBtn.needsSetup{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.25);
+  box-shadow:none;color:var(--muted);font-size:13px;}
+.ddayStartBtn.locked{background:rgba(245,196,83,.1);border:1px solid rgba(245,196,83,.3);
+  box-shadow:none;color:var(--gold);font-size:13px;}
 
 .ddayModeCard{width:100%;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
   background:linear-gradient(120deg,rgba(255,77,94,.22),rgba(245,196,83,.14));
@@ -374,21 +383,20 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .ddayModeCard .dmcSub{font-size:11.5px;color:rgba(255,255,255,.75);margin-top:2px;}
 .ddayModeCard .dmcLock{font-size:18px;flex-shrink:0;}
 
-.ddaySetupCard{background:var(--surface);border-radius:20px;padding:26px 22px;width:100%;max-width:360px;
-  display:flex;flex-direction:column;gap:14px;text-align:left;}
-.ddayPeriodRow{display:flex;gap:8px;flex-wrap:wrap;}
-.ddayLevelLabel{font-size:12px;font-weight:700;color:var(--muted);margin-top:2px;}
-.ddayLevelRow{display:flex;gap:6px;flex-wrap:wrap;}
-.ddayLevelBtn{border:1px solid var(--line);background:rgba(255,255,255,.06);
-  color:var(--ink);padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;}
-.ddayLevelBtn.on{color:#1F2937;}
-.ddayPeriodBtn{flex:1;min-width:60px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);
-  padding:10px 0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;}
-.ddayPeriodBtn.on{border-color:var(--accent);background:rgba(255,77,94,.18);color:#fff;}
+.ddaySetupCard{background:var(--surface);border-radius:18px;padding:18px 20px;width:100%;max-width:320px;
+  display:flex;flex-direction:column;gap:6px;text-align:left;}
+.ddaySetupCard .bigemoji{font-size:26px;margin-bottom:-8px;}
+.ddaySetupCard h2{font-size:15px;margin:0;}
+.ddayLevelLabel{font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;margin-bottom:-2px;}
+.ddayLevelSelect{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px;color:var(--ink);font-size:13px;font-weight:700;outline:none;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8E9C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;}
 .ddayCustomInput{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;
-  padding:10px 12px;color:var(--ink);font-size:13px;box-sizing:border-box;}
-.ddayPreview{background:rgba(245,196,83,.1);border:1px solid rgba(245,196,83,.3);border-radius:12px;
-  padding:12px 14px;font-size:13px;color:var(--ink);line-height:1.6;}
+  padding:9px 12px;color:var(--ink);font-size:13px;box-sizing:border-box;margin-top:-2px;}
+.ddayPreview{background:rgba(245,196,83,.1);border:1px solid rgba(245,196,83,.3);border-radius:10px;
+  padding:9px 12px;font-size:12.5px;color:var(--ink);line-height:1.5;}
 .ddayPreview b{color:var(--gold);}
 .hskToast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);
   background:rgba(20,21,28,.95);color:#fff;font-size:13px;font-weight:700;padding:11px 20px;
@@ -681,8 +689,8 @@ body{display:flex;justify-content:center;min-height:100vh;min-height:100dvh;}
 .scorering{font-size:44px;font-weight:900;color:var(--gold);}
 .scorering small{font-size:16px;color:var(--muted);font-weight:700;}
 .pop .msg{color:var(--muted);font-size:13.5px;line-height:1.6;}
-.pop .btns{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px;}
-.pop .btns button{width:100%;padding:14px 0;border-radius:13px;font-size:14.5px;font-weight:700;cursor:pointer;}
+.pop .btns{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:2px;}
+.pop .btns button{width:100%;padding:10px 0;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer;}
 .pop .again{border:0;background:var(--accent);color:#fff;}
 .pop .home{border:1px solid var(--line);background:none;color:var(--muted);}
 .confetti{position:absolute;font-size:20px;animation:fall 1.6s ease-in forwards;pointer-events:none;}
@@ -727,7 +735,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   <div class="topNav" id="topNav">
     <button class="topNavBtn on" id="navHomeBtn"><span class="navEmoji">🏠</span><span class="navLabel"> 홈</span></button>
     <button class="topNavBtn" id="navStudyBtn"><span class="navEmoji">📊</span><span class="navLabel"> 학습</span></button>
-    <button class="topNavBtn" id="navShopBtn"><span class="navEmoji">🛍️</span><span class="navLabel"> 자료실</span></button>
+    <button class="topNavBtn" id="navShopBtn"><span class="navEmoji">🛍️</span><span class="navLabel"> 스토어</span></button>
     <button class="topNavBtn" id="navMyBtn"><span class="navEmoji">🙋</span><span class="navLabel"> 마이페이지</span></button>
   </div>
 
@@ -755,6 +763,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       </button>
     </div>
     <div class="dailyDone hidden" id="dailyDoneMsg">🎉 오늘 목표 달성! 대단해요</div>
+    <button class="ddayStartBtn hidden" id="ddayStartBtn"></button>
     <div class="levelGrid" id="levelGrid"></div>
   </div>
 
@@ -12883,10 +12892,31 @@ function renderDdayWidget() {
     ring.style.removeProperty("--pct");
     sub.textContent = unlocked ? "설정하기" : (PRELAUNCH_MODE ? "출시예정" : "🔒");
   }
+  // 동그라미는 항상 "설정/변경" 전용 — 실제 학습 시작은 아래 별도 버튼에서
   btn.onclick = () => {
     if (!unlocked) { showDdayLockedPopup(); return; }
-    if (plan) { startDdayStudy(); } else { showDdaySetupPopup(); }
+    showDdaySetupPopup();
   };
+
+  const startBtn = $("ddayStartBtn");
+  if (startBtn) {
+    startBtn.classList.remove("hidden");
+    if (!unlocked) {
+      startBtn.className = "ddayStartBtn locked";
+      startBtn.innerHTML = "⚡ D-Day 공부 시작하기";
+      startBtn.onclick = () => showDdayLockedPopup();
+    } else if (plan) {
+      const daysLeft = ddayRemainingDays(plan);
+      const daily = ddayDailyTarget(plan);
+      startBtn.className = "ddayStartBtn";
+      startBtn.innerHTML = `⚡ D-Day 공부 시작하기 <span style="opacity:.85;font-weight:700;">(D-${daysLeft} · 오늘 ${daily}단어)</span>`;
+      startBtn.onclick = () => startDdayStudy();
+    } else {
+      startBtn.className = "ddayStartBtn needsSetup";
+      startBtn.innerHTML = "⚡ D-Day 공부 시작하기";
+      startBtn.onclick = () => { toast("D-Day설정후 공부 시작하세요^^"); };
+    }
+  }
 }
 
 function renderDdayModeCard() {
@@ -12968,23 +12998,23 @@ function showDdaySetupPopup() {
   let selectedLevelId = (existing && existing.levelId) || curLevel;
   const getLv = () => LEVELS.find((l) => l.id === selectedLevelId) || LEVELS[0];
   const getTotalWords = () => (WORDS_BY_LEVEL[selectedLevelId] || []).length;
+  const presetDays = [7, 15, 20, 30];
+  const existingIsPreset = existing && presetDays.includes(existing.totalDays);
 
   wrap.innerHTML = `<div class="pop ddaySetupCard">
     <div class="bigemoji">⚡</div>
     <h2>D-Day 학습 설정</h2>
     <div class="ddayLevelLabel">급수 선택</div>
-    <div class="ddayLevelRow" id="ddayLevelRow">
-      ${LEVELS.map((l) => `<button class="ddayLevelBtn${l.id === selectedLevelId ? " on" : ""}" data-level="${l.id}" style="${l.id === selectedLevelId ? `background:${l.color};border-color:${l.color}` : `border-color:${l.color}80;background:${l.color}22`}">${l.label}</button>`).join("")}
-    </div>
-    <p class="premLine" id="ddayLevelDesc"></p>
-    <div class="ddayPeriodRow">
-      <button class="ddayPeriodBtn" data-days="7">7일</button>
-      <button class="ddayPeriodBtn" data-days="15">15일</button>
-      <button class="ddayPeriodBtn" data-days="20">20일</button>
-      <button class="ddayPeriodBtn" data-days="30">30일</button>
-    </div>
-    <input type="number" class="ddayCustomInput" id="ddayCustomDays" placeholder="직접 입력 (일수)" min="1" max="365">
-    <div class="ddayPreview" id="ddayPreview">기간을 선택하면 하루 목표 단어 수를 보여드려요.</div>
+    <select class="ddayLevelSelect" id="ddayLevelSelect">
+      ${LEVELS.map((l) => `<option value="${l.id}"${l.id === selectedLevelId ? " selected" : ""}>${l.label} · ${(WORDS_BY_LEVEL[l.id] || []).length.toLocaleString()}단어</option>`).join("")}
+    </select>
+    <div class="ddayLevelLabel">기간 선택</div>
+    <select class="ddayLevelSelect" id="ddayPeriodSelect">
+      ${presetDays.map((d) => `<option value="${d}"${existing && existing.totalDays === d ? " selected" : ""}>${d}일</option>`).join("")}
+      <option value="custom"${existing && !existingIsPreset ? " selected" : ""}>직접 입력</option>
+    </select>
+    <input type="number" class="ddayCustomInput hidden" id="ddayCustomDays" placeholder="일수 입력 (예: 45)" min="1" max="365" value="${existing && !existingIsPreset ? existing.totalDays : ""}">
+    <div class="ddayPreview" id="ddayPreview">급수·기간을 정하면 하루 목표를 보여드려요.</div>
     <div class="btns">
       <button class="subBtn" id="ddayConfirmBtn">${existing ? "변경 완료" : "설정 완료"}</button>
       ${existing ? '<button class="closeBtn" id="ddayCancelPlanBtn" style="color:var(--bad);">계획 취소하기</button>' : ""}
@@ -12992,51 +13022,40 @@ function showDdaySetupPopup() {
     </div>
   </div>`;
 
-  let selectedDays = existing ? existing.totalDays : null;
+  let selectedDays = existing ? existing.totalDays : Number($("ddayPeriodSelect").value);
 
-  const updateLevelDesc = () => {
+  const updatePreview = () => {
     const lv = getLv();
     const willOverwrite = existing && existing.levelId !== selectedLevelId;
-    $("ddayLevelDesc").innerHTML = `${lv.label} 총 ${getTotalWords().toLocaleString()}단어를 목표 기간에 맞춰 매일 무작위로 나눠 드려요.`
-      + (willOverwrite ? `<br><span style="color:var(--bad);">⚠️ 기존 ${LEVELS.find((l) => l.id === existing.levelId).label} 계획은 사라져요.</span>` : "");
-  };
-  const updatePreview = () => {
-    if (!selectedDays || selectedDays < 1) { $("ddayPreview").textContent = "기간을 선택하면 하루 목표 단어 수를 보여드려요."; return; }
+    if (!selectedDays || selectedDays < 1) {
+      $("ddayPreview").innerHTML = "급수·기간을 정하면 하루 목표를 보여드려요.";
+      return;
+    }
     const daily = Math.ceil(getTotalWords() / selectedDays);
-    $("ddayPreview").innerHTML = `<b>${getLv().label}</b> ${getTotalWords().toLocaleString()}단어 ÷ ${selectedDays}일 = 하루 약 <b>${daily}단어</b>`;
+    $("ddayPreview").innerHTML = `<b>${lv.label}</b> ${getTotalWords().toLocaleString()}÷${selectedDays}일 = 하루 <b>${daily}단어</b>`
+      + (willOverwrite ? `<br><span style="color:var(--bad);font-size:11px;">⚠️ 기존 ${LEVELS.find((l) => l.id === existing.levelId).label} 계획은 사라져요</span>` : "");
   };
 
-  document.querySelectorAll(".ddayLevelBtn").forEach((b) => {
-    b.onclick = () => {
-      selectedLevelId = b.dataset.level;
-      document.querySelectorAll(".ddayLevelBtn").forEach((x) => {
-        const xLv = LEVELS.find((l) => l.id === x.dataset.level);
-        const on = x === b;
-        x.classList.toggle("on", on);
-        x.style.background = on ? xLv.color : xLv.color + "22";
-        x.style.borderColor = on ? xLv.color : xLv.color + "80";
-      });
-      updateLevelDesc();
-      updatePreview();
-    };
-  });
-  document.querySelectorAll(".ddayPeriodBtn").forEach((b) => {
-    if (existing && Number(b.dataset.days) === existing.totalDays) b.classList.add("on");
-    b.onclick = () => {
-      selectedDays = Number(b.dataset.days);
-      document.querySelectorAll(".ddayPeriodBtn").forEach((x) => x.classList.remove("on"));
-      b.classList.add("on");
-      $("ddayCustomDays").value = "";
-      updatePreview();
-    };
-  });
+  $("ddayLevelSelect").onchange = (e) => {
+    selectedLevelId = e.target.value;
+    updatePreview();
+  };
+  $("ddayPeriodSelect").onchange = (e) => {
+    if (e.target.value === "custom") {
+      $("ddayCustomDays").classList.remove("hidden");
+      const v = Number($("ddayCustomDays").value);
+      selectedDays = v > 0 ? v : null;
+    } else {
+      $("ddayCustomDays").classList.add("hidden");
+      selectedDays = Number(e.target.value);
+    }
+    updatePreview();
+  };
+  if ($("ddayPeriodSelect").value === "custom") { $("ddayCustomDays").classList.remove("hidden"); }
   $("ddayCustomDays").oninput = () => {
     const v = Number($("ddayCustomDays").value);
-    if (v > 0) {
-      selectedDays = v;
-      document.querySelectorAll(".ddayPeriodBtn").forEach((x) => x.classList.remove("on"));
-      updatePreview();
-    }
+    selectedDays = v > 0 ? v : null;
+    updatePreview();
   };
   $("ddayConfirmBtn").onclick = () => {
     if (!selectedDays || selectedDays < 1) { $("ddayPreview").textContent = "⚠️ 기간을 선택하거나 입력해 주세요"; return; }
@@ -13059,7 +13078,6 @@ function showDdaySetupPopup() {
   }
   $("ddayCloseBtn").onclick = () => { wrap.className = "hidden"; wrap.innerHTML = ""; };
 
-  updateLevelDesc();
   updatePreview();
 }
 
