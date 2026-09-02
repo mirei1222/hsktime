@@ -930,7 +930,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
       <div class="qfeedback" id="qfeedback"></div>
     </div>
     <div class="choices" id="choices"></div>
-    <div class="nav" id="quizNav"><button id="quizNextBtn" class="primary">다음 →</button></div>
+    <div class="nav" id="quizNav"><button id="quizPrevBtn">← 이전</button><button id="quizNextBtn" class="primary">다음 →</button></div>
   </div>
 
   <div id="recordScreen" class="hidden">
@@ -13589,6 +13589,7 @@ $("starReviewBtn").onclick = () => { if (getStarredWords().length) startReviewQu
 let mode = "study", curCat = null;
 let deck = [], idx = 0, showStroke = false;
 let quizQs = [], qIdx = 0, score = 0, wrongCount = 0, answered = false, qNextTimer = null;
+let quizHistory = [], quizHistoryIndex = -1;
 function advanceQuiz() { renderQuiz(); }
 
 function show(id) {
@@ -13817,6 +13818,12 @@ $("studyBack").onclick = () => {
 };
 $("quizBack").onclick = () => show("catScreen");
 $("quizNextBtn").onclick = () => { clearTimeout(qNextTimer); advanceQuiz(); };
+$("quizPrevBtn").onclick = () => {
+  clearTimeout(qNextTimer);
+  if (quizHistoryIndex <= 0) { toast("첫 문제예요"); return; }
+  quizHistoryIndex--;
+  renderQuiz(quizHistory[quizHistoryIndex]);
+};
 
 let quizWords = [], quizFilter = "전체", lastPickedId = null, qCounter = 0, curQuizItem = null, reviewMode = false;
 const QUIZ_TYPES = ["sentence", "meaning", "hanzi2pinyin", "pinyin2meaning"];
@@ -13871,6 +13878,7 @@ function startQuizPool(filterCat) {
   $("quizFilterRow").classList.remove("hidden");
   quizFilter = filterCat || "전체";
   score = 0; wrongCount = 0; qCounter = 0; lastPickedId = null;
+  quizHistory = []; quizHistoryIndex = -1;
   quizWords = CATS.filter((c) => !c.wide).reduce((acc, c) => acc.concat(byCat[c.name] || []), []);
   const lv2 = LEVELS.find((l) => l.id === curLevel);
   applyLevelBadge($("quizLevelLabel"), lv2);
@@ -13884,6 +13892,7 @@ function startReviewQuizFromIds(ids, label) {
   reviewMode = true;
   quizFilter = "전체";
   score = 0; wrongCount = 0; qCounter = 0; lastPickedId = null;
+  quizHistory = []; quizHistoryIndex = -1;
   quizWords = ids.map((id) => ALL_WORDS_BY_ID[id]).filter(Boolean).map((x) => x.word);
   $("quizLevelLabel").textContent = label;
   $("quizLevelLabel").style.background = "";
@@ -13910,22 +13919,29 @@ document.querySelectorAll(".qFilterChip").forEach((b) => {
     clearTimeout(qNextTimer);
     quizFilter = b.dataset.cat;
     score = 0; wrongCount = 0; qCounter = 0; lastPickedId = null;
+    quizHistory = []; quizHistoryIndex = -1;
     applyChipColors();
     updateQuizPoolInfo();
     renderQuiz();
   };
 });
 
-function renderQuiz() {
+function renderQuiz(snapshot) {
   answered = false;
   clearTimeout(qNextTimer);
   $("quizNav").style.display = "flex";
 
-  const item = pickQuizItem();
-  if (!item) { $("sentence").innerHTML = "이 카테고리에는 아직 단어가 없어요."; $("choices").innerHTML = ""; return; }
+  let item, options;
+  if (snapshot) {
+    item = snapshot.item;
+    options = snapshot.options;
+  } else {
+    item = pickQuizItem();
+    if (!item) { $("sentence").innerHTML = "이 카테고리에는 아직 단어가 없어요."; $("choices").innerHTML = ""; return; }
+  }
   const lv = LEVELS.find((l) => l.id === curLevel);
   const locked = !reviewMode && lv && !hasAccessToLevel(lv);
-  if (locked && !previewGate(lv, item.word[0])) return;
+  if (!snapshot && locked && !previewGate(lv, item.word[0])) return;
 
   const badge = $("quizPreviewBadge");
   if (locked) {
@@ -13966,11 +13982,11 @@ function renderQuiz() {
   }
 
   $("qfeedback").textContent = ""; $("qfeedback").className = "qfeedback";
-  qCounter++;
+  if (snapshot) { qCounter = snapshot.qCounterValue; } else { qCounter++; }
   const total = quizTotalCount();
   $("quizCount").textContent = "문제 " + qCounter + (total ? "/" + total.toLocaleString() : "") + "  ✅ " + score + "  ❌ " + wrongCount;
 
-  const options = buildQuizOptions(w);
+  if (!snapshot) { options = buildQuizOptions(w); }
   const box = $("choices"); box.innerHTML = "";
   options.forEach((opt) => {
     const b = document.createElement("button");
@@ -13985,11 +14001,45 @@ function renderQuiz() {
     b.onclick = () => pick(b, opt[field], ans, w, item.type);
     box.appendChild(b);
   });
+
+  if (!snapshot) {
+    quizHistory.push({ item, options, qCounterValue: qCounter, answeredState: null });
+    quizHistoryIndex = quizHistory.length - 1;
+  } else if (snapshot.answeredState) {
+    replayAnsweredState(snapshot.answeredState, ans);
+  }
+  updateQuizNavButtons();
+}
+function replayAnsweredState(st, ans) {
+  answered = true;
+  const blank = $("blank");
+  if (blank) { blank.textContent = ans; blank.classList.add(st.ok ? "g" : "b"); }
+  document.querySelectorAll("#choices button").forEach((b) => {
+    b.disabled = true;
+    if (b.dataset.val === st.chosen) b.classList.add(st.ok ? "pg" : "pb");
+    if (b.dataset.val === ans) b.classList.add("rv");
+  });
+  $("qcard").classList.add(st.ok ? "good" : "bad");
+  $("qfeedback").textContent = st.ok ? "정답! 잘했어요 🎉" : "아쉬워요! 정답은 「" + ans + "」";
+  $("qfeedback").className = "qfeedback " + (st.ok ? "g" : "b");
+}
+function updateQuizNavButtons() {
+  const prevBtn = $("quizPrevBtn");
+  if (prevBtn) prevBtn.disabled = quizHistoryIndex <= 0;
+}
+function advanceQuiz() {
+  if (quizHistoryIndex < quizHistory.length - 1) {
+    quizHistoryIndex++;
+    renderQuiz(quizHistory[quizHistoryIndex]);
+  } else {
+    renderQuiz();
+  }
 }
 
 function pick(btn, chosen, ans, wordData, type) {
   if (answered) return; answered = true;
   const ok = chosen === ans;
+  if (quizHistory[quizHistoryIndex]) quizHistory[quizHistoryIndex].answeredState = { chosen, ok };
   const blank = $("blank");
   if (blank) { blank.textContent = ans; blank.classList.add(ok ? "g" : "b"); }
 
