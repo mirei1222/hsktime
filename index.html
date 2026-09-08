@@ -12287,23 +12287,24 @@ function wordAudioUrl(folder, id) {
 
 let lastSpeakTime = 0;
 function speakWord(entry) {
-  if (!entry) return;
+  if (!entry) return null;
 
   const now = Date.now();
-  if (now - lastSpeakTime < 300) return; // 0.3초 연타 방지
+  if (now - lastSpeakTime < 300) return null; // 0.3초 연타 방지
   lastSpeakTime = now;
 
   const id = entry[0];
   const folder = folderForId(id);
   const url = wordAudioUrl(folder, id);
 
-  if (!url) return;
+  if (!url) return null;
 
   stopAllAudio();
 
   const audio = new Audio(url);
   window.currentAudio = audio;
   audio.play().catch((e) => console.warn("단어 오디오 재생 실패:", e));
+  return audio;
 }
 
 /* --- 예문 음성 (_sentence.mp3) --- */
@@ -12316,31 +12317,32 @@ function sentenceAudioUrl(folder, id) {
 
 let lastSpeakSentenceTime = 0;
 function speakSentence(entry) {
-  if (!entry) return;
+  if (!entry) return null;
 
   const now = Date.now();
-  if (now - lastSpeakSentenceTime < 300) return; // 0.3초 연타 방지
+  if (now - lastSpeakSentenceTime < 300) return null; // 0.3초 연타 방지
   lastSpeakSentenceTime = now;
 
   const id = entry[0];
   const folder = folderForId(id);
   const url = sentenceAudioUrl(folder, id);
 
-  if (!url) return;
+  if (!url) return null;
 
   stopAllAudio();
 
   const audio = new Audio(url);
   window.currentAudio = audio;
   audio.play().catch((e) => console.warn("예문 오디오 재생 실패:", e));
+  return audio;
 }
 
 /* --- 통합 호출 함수 (HTML 호환용) --- */
 function speak(entry, type) {
   if (type === 'sentence' || type === 'sen' || type === 'ex') {
-    speakSentence(entry);
+    return speakSentence(entry);
   } else {
-    speakWord(entry);
+    return speakWord(entry);
   }
 }
 
@@ -13939,9 +13941,10 @@ $("studyBack").onclick = () => {
   else { show("catScreen"); renderCats(); }
 };
 $("quizBack").onclick = () => show("catScreen");
-$("quizNextBtn").onclick = () => { clearTimeout(qNextTimer); advanceQuiz(); };
+$("quizNextBtn").onclick = () => { clearTimeout(qNextTimer); stopAllAudio(); advanceQuiz(); };
 $("quizPrevBtn").onclick = () => {
   clearTimeout(qNextTimer);
+  stopAllAudio();
   if (quizHistoryIndex <= 0) { toast("첫 문제예요"); return; }
   quizHistoryIndex--;
   renderQuiz(quizHistory[quizHistoryIndex]);
@@ -14177,10 +14180,23 @@ function pick(btn, chosen, ans, wordData, type) {
   if (ok) { score++; sndGood(); if (reviewMode) removeWrongWord(wordData[0]); }
   else { wrongCount++; sndBad(); addWrongWord(wordData[0]); }
 
-  speak(wordData, 'sentence');
+  const audioObj = (type === "sentence") ? speak(wordData, "sentence") : speak(wordData, "word");
 
   $("quizNav").style.display = "flex";
-  qNextTimer = setTimeout(advanceQuiz, 1500);
+  clearTimeout(qNextTimer);
+  if (audioObj) {
+    qNextTimer = setTimeout(advanceQuiz, 4000); // 재생 실패 등 대비 안전장치
+    audioObj.addEventListener("ended", () => {
+      clearTimeout(qNextTimer);
+      qNextTimer = setTimeout(advanceQuiz, 400);
+    });
+    audioObj.addEventListener("error", () => {
+      clearTimeout(qNextTimer);
+      qNextTimer = setTimeout(advanceQuiz, 1500);
+    });
+  } else {
+    qNextTimer = setTimeout(advanceQuiz, 1500);
+  }
 }
 
 
