@@ -13339,7 +13339,12 @@ const WORDLISTS = [
 ];
 function handleWordlistClick(file, title) {
   if (isLoggedIn()) {
-    window.open(file, "_blank", "noopener,noreferrer");
+    const a = document.createElement("a");
+    a.href = file;
+    a.download = file.split("/").pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } else {
     showWordlistLoginNotice(file, title);
   }
