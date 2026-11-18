@@ -710,6 +710,24 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   gtag('js', new Date());
   gtag('config', 'G-6R5GK5X16G');
 </script>
+<script>
+  function renderTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayName = days[today.getDay()];
+    
+    const dateEl = document.getElementById('todayDate');
+    if (dateEl) {
+      dateEl.textContent = `📅 ${year}.${month}.${day} (${dayName})`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderTodayDate);
+</script>
 </head>
 <body>
 <div id="splashScreen">
@@ -729,6 +747,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   </div>
 </div>
 <div id="app">
+  <!-- 🔥 여기에 오늘 날짜 표시용 div 추가 -->
+  <div id="todayDate" style="color: var(--gold); font-size: 13px; font-weight: 700; margin-bottom: 10px; padding-left: 4px; letter-spacing: -0.2px;"></div>
+
   <div class="banner" id="mainBanner">
     <div class="bannerTop">
       <div class="bannerTextCol">
@@ -740,7 +761,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
     </div>
     <div class="bannerTag hsk3tag"><span class="hsk3Emph">HSK3.0(新개정)</span> 공식 대강 기반</div>
   </div>
-
   <div class="topNav" id="topNav">
     <button class="topNavBtn on" id="navHomeBtn"><span class="navEmoji">🏠</span><span class="navLabel"> 홈</span></button>
     <button class="topNavBtn" id="navStudyBtn"><span class="navEmoji">📊</span><span class="navLabel"> 학습</span></button>
